@@ -5,15 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Sign;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
@@ -256,7 +258,7 @@ public class ZoneLobby {
 			this.volume = new Volume("lobby", lobbyWorld);
 		} else if (this.volume.isSaved()) {
 			this.volume.resetBlocks();
-			this.volume.setWorld(lobbyWorld);	// set world for the case where where are changing lobby location between worlds	
+			this.volume.setWorld(lobbyWorld);	// set world for the case where where are changing lobby location between worlds
 		}
 	}
 
@@ -289,7 +291,7 @@ public class ZoneLobby {
 				// If air, leave original blocks.
 				this.volume.setFaceMaterial(BlockFace.DOWN, warzone.getLobbyMaterials().getFloorBlock());
 			}
-			
+
 			if (!warzone.getLobbyMaterials().getOutlineBlock().getType().equals(Material.AIR)) {
 				// If air, leave original blocks.
 				this.volume.setFloorOutline(warzone.getLobbyMaterials().getOutlineBlock());
@@ -307,6 +309,9 @@ public class ZoneLobby {
 			// add team gates or single auto assign gate
 			this.placeAutoAssignGate();
 			for (String teamName : this.teamGateBlocks.keySet()) {
+				for (Team t : this.warzone.getTeams()) {
+					this.removeTeamGateSign(t);
+				}
 				Block gateInfo = this.teamGateBlocks.get(teamName).getBlock();
 				this.placeTeamGate(gateInfo, TeamKind.teamKindFromString(teamName));
 			}
@@ -332,7 +337,7 @@ public class ZoneLobby {
 			BlockFace front = this.wall;
 			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
-			
+
 			if (this.wall == Direction.NORTH()) {
 				leftSide = Direction.EAST();
 				rightSide = Direction.WEST();
@@ -346,33 +351,33 @@ public class ZoneLobby {
 				leftSide = Direction.NORTH();
 				rightSide = Direction.SOUTH();
 			}
-			
+
 			Block clearedPathStartBlock = this.lobbyMiddleWallBlock.getBlock().getRelative(this.wall, 2);
 			Volume warzoneTeleportAir = new Volume("warzoneTeleport", clearedPathStartBlock.getWorld());
 			warzoneTeleportAir.setCornerOne(clearedPathStartBlock.getRelative(leftSide));
 			warzoneTeleportAir.setCornerTwo(clearedPathStartBlock.getRelative(rightSide).getRelative(front, 4).getRelative(BlockFace.UP));
 			warzoneTeleportAir.setToMaterial(Material.AIR);
-			
+
 			clearedPathStartBlock.setType(Material.AIR);
 			clearedPathStartBlock.getRelative(BlockFace.UP).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	// teleport block
 			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
-			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
-			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
-			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
-			
+
 			// set zone sign
 			Block zoneSignBlock = this.lobbyMiddleWallBlock.getBlock().getRelative(this.wall, 4);
 			zoneSignBlock.setType(Material.OAK_SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneSignBlock.getState();
-			org.bukkit.material.Sign data = (Sign) block.getData();
-			data.setFacingDirection(this.wall);
-			block.setData(data);
+			org.bukkit.block.data.type.Sign data = (org.bukkit.block.data.type.Sign) block.getBlockData();
+			data.setRotation(this.wall);
+			block.setBlockData(data);
 			String[] lines = new String[4];
 			if (this.autoAssignGate != null) {
 				lines = MessageFormat.format(War.war.getString("sign.lobby.autoassign"), warzone.getName()).split("\n");
@@ -459,7 +464,7 @@ public class ZoneLobby {
 			BlockFace front = this.wall;
 			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
-			
+
 			if (this.wall == Direction.NORTH()) {
 				leftSide = Direction.EAST();
 				rightSide = Direction.WEST();
@@ -473,10 +478,11 @@ public class ZoneLobby {
 				leftSide = Direction.NORTH();
 				rightSide = Direction.SOUTH();
 			}
-			
+
 			// minimal air path
+			block.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(front).setType(Material.AIR);
 			this.clearGatePath(block, front, leftSide, rightSide, true);
-			
+
 			// gate blocks
 			BlockState lightBlock = block.getRelative(BlockFace.DOWN).getState();
 			lightBlock.setType(warzone.getLobbyMaterials().getLightBlock().getType());
@@ -488,6 +494,8 @@ public class ZoneLobby {
 			this.setBlock(block.getRelative(rightSide), teamKind);
 			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP), teamKind);
 			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
+
+
 			this.setBlock(block.getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
 		}
 	}
@@ -497,7 +505,7 @@ public class ZoneLobby {
 			BlockFace front = null;
 			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
-			
+
 			// warhub link is opposite direction as zone wall
 			if (this.wall == Direction.NORTH()) {
 				front = Direction.SOUTH();
@@ -508,11 +516,11 @@ public class ZoneLobby {
 			} else if (this.wall == Direction.WEST()) {
 				front = Direction.EAST();
 			}
-			
+
 			if (this.wall == Direction.NORTH()) {
 				leftSide = Direction.EAST();
 				rightSide = Direction.WEST();
-				
+
 			} else if (this.wall == Direction.EAST()) {
 				leftSide = Direction.SOUTH();
 				rightSide = Direction.NORTH();
@@ -523,8 +531,9 @@ public class ZoneLobby {
 				leftSide = Direction.NORTH();
 				rightSide = Direction.SOUTH();
 			}
-			
+
 			// minimal air path
+			block.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(front).setType(Material.AIR);
 			this.clearGatePath(block, front, leftSide, rightSide, false);
 
 			// gate blocks
@@ -560,7 +569,7 @@ public class ZoneLobby {
 			BlockFace front = this.wall;
 			BlockFace leftSide = null; // lookingat the zone
 			BlockFace rightSide = null;
-			
+
 			if (this.wall == Direction.NORTH()) {
 				leftSide = Direction.EAST();
 				rightSide = Direction.WEST();
@@ -574,15 +583,15 @@ public class ZoneLobby {
 				leftSide = Direction.NORTH();
 				rightSide = Direction.SOUTH();
 			}
-			
-			
+
+
 			List<Team> teams = this.warzone.getTeams();
-			
+
 			Block autoAssignGateBlock = this.autoAssignGate.getBlock();
-			
+
 			// minimal air path
 			this.clearGatePath(autoAssignGateBlock, front, leftSide, rightSide, false);
-			
+
 			// gate blocks
 			BlockState lightBlock = autoAssignGateBlock.getRelative(BlockFace.DOWN).getState();
 			lightBlock.setType(warzone.getLobbyMaterials().getLightBlock().getType());
@@ -612,14 +621,14 @@ public class ZoneLobby {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	public boolean isAutoAssignGate(Location location) {
-		if (this.autoAssignGate != null 
-				&& (location.getBlockX() == this.autoAssignGate.getX() 
-				&& location.getBlockY() == this.autoAssignGate.getY() 
+		if (this.autoAssignGate != null
+				&& (location.getBlockX() == this.autoAssignGate.getX()
+				&& location.getBlockY() == this.autoAssignGate.getY()
 				&& location.getBlockZ() == this.autoAssignGate.getZ())) {
 			return true;
 		}
@@ -630,7 +639,7 @@ public class ZoneLobby {
 		for (Team team : this.warzone.getTeams()) {
 			if (this.isInTeamGate(team, location)) {
 				return team;
-			}	
+			}
 		}
 		return null;
 	}
@@ -652,13 +661,13 @@ public class ZoneLobby {
 	}
 
 	public boolean isInWarHubLinkGate(Location location) {
-		if (this.warHubLinkGate != null 
-				&& location.getBlockX() == this.warHubLinkGate.getX() 
-				&& location.getBlockY() == this.warHubLinkGate.getY() 
+		if (this.warHubLinkGate != null
+				&& location.getBlockX() == this.warHubLinkGate.getX()
+				&& location.getBlockY() == this.warHubLinkGate.getY()
 				&& location.getBlockZ() == this.warHubLinkGate.getZ()) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -670,7 +679,7 @@ public class ZoneLobby {
 					return true;
 				}
 			}
-			
+
 			if (this.autoAssignGate != null && this.isPartOfGate(this.autoAssignGate.getBlock(), block)) {
 				// auto assign
 				return true;
@@ -710,6 +719,26 @@ public class ZoneLobby {
 		if (info != null) {
 			this.resetTeamGateSign(team, info.getBlock());
 		}
+	}
+
+	public void removeTeamGateSign(Team team) {
+		Location info = this.teamGateBlocks.get(team.getName());
+		Block gate = info.getBlock();
+
+		BlockFace direction = null;
+		direction = this.wall;
+		if (this.wall == Direction.NORTH()) {
+			direction = Direction.SOUTH();
+		} else if (this.wall == Direction.EAST()) {
+			direction = Direction.WEST();
+		} else if (this.wall == Direction.SOUTH()) {
+			direction = Direction.NORTH();
+		} else if (this.wall == Direction.WEST()) {
+			direction = Direction.EAST();
+		}
+
+		Block block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
+		block.setType(Material.AIR);
 	}
 
 	private void resetTeamGateSign(Team team, Block gate) {
@@ -758,25 +787,17 @@ public class ZoneLobby {
 			direction = Direction.EAST();
 		}
 
-		if (this.wall == Direction.NORTH()) {
-			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
-		} else if (this.wall == Direction.EAST()) {
-			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
-		} else if (this.wall == Direction.SOUTH()) {
-			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
-		} else if (this.wall == Direction.WEST()) {
-			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
-		}
+		block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
 
 		block.setType(Material.OAK_WALL_SIGN);
 		org.bukkit.block.Sign state = (org.bukkit.block.Sign) block.getState();
-		org.bukkit.material.Sign data = (Sign) state.getData();
-		data.setFacingDirection(direction);
-		state.setData(data);
+		org.bukkit.block.data.type.WallSign data = (WallSign) state.getBlockData();
+		data.setFacing(direction);
+		state.setBlockData(data);
 		for (int i = 0; i < lines.length; i++) {
 			state.setLine(i, lines[i]);
 		}
-		state.update(true);
+		state.update();
 	}
 
 	public boolean isLeavingZone(Location location) {
@@ -828,13 +849,13 @@ public class ZoneLobby {
 
 		return false;
 	}
-	
+
 	private void clearGatePath(Block gateBlock, BlockFace awayFromGate, BlockFace left, BlockFace right, boolean clearPathForPlayer) {
 		Volume gateAirVolume = new Volume("gateAir", gateBlock.getWorld());
 		gateAirVolume.setCornerOne(gateBlock.getRelative(right));
 		gateAirVolume.setCornerTwo(gateBlock.getRelative(left).getRelative(awayFromGate, 2).getRelative(BlockFace.UP, 2));
 		gateAirVolume.setToMaterial(Material.AIR);
-		
+
 		if (clearPathForPlayer) {
 			gateBlock.getRelative(awayFromGate, 2).getRelative(right, 2).setType(Material.AIR);
 			gateBlock.getRelative(awayFromGate, 2).getRelative(right, 2).getRelative(BlockFace.UP).setType(Material.AIR);
@@ -843,6 +864,6 @@ public class ZoneLobby {
 			gateBlock.getRelative(awayFromGate, 2).getRelative(left, 2).getRelative(BlockFace.UP).setType(Material.AIR);
 			gateBlock.getRelative(awayFromGate, 2).getRelative(left, 2).getRelative(BlockFace.UP, 2).setType(Material.AIR);
 		}
-		
+
 	}
 }

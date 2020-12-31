@@ -1,19 +1,21 @@
 package com.tommytony.war.volume;
 
-import com.tommytony.war.Team;
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.config.WarConfig;
-import com.tommytony.war.job.PartialZoneResetJob;
-import com.tommytony.war.mapper.ZoneVolumeMapper;
-import com.tommytony.war.structure.Monument;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.logging.Level;
+import com.tommytony.war.Team;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.job.PartialChestResetJob;
+import com.tommytony.war.job.PartialZoneResetJob;
+import com.tommytony.war.mapper.ZoneVolumeMapper;
+import com.tommytony.war.structure.Monument;
 
 /**
  *
@@ -83,6 +85,10 @@ public class ZoneVolume extends Volume {
 	public int resetSection(Connection conn, int start, int total, boolean[][][] changes) throws SQLException {
 		return ZoneVolumeMapper.reloadZoneBlocks(conn, this, start, total, changes);
 	}
+	
+	public int resetSectionChests(Connection conn, int start, int total, boolean[][][] changes) throws SQLException {
+		return ZoneVolumeMapper.reloadZoneChests(conn, this, start, total, changes);
+	}
 
 	/**
 	 * Reload all saved entities in the warzone. Consists of paintings, item frames, etc.
@@ -112,6 +118,16 @@ public class ZoneVolume extends Volume {
 	public void resetBlocksAsJob() {
 		try {
 			PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war.getWarConfig().getInt(WarConfig.RESETSPEED));
+			job.runTask(War.war);
+		} catch (SQLException e) {
+			War.war.getLogger().log(Level.WARNING, "Failed to reset warzone - cannot get count of saved blocks", e);
+		}
+	}
+	
+	@Override
+	public void resetChestsAsJob() {
+		try {
+			PartialChestResetJob job = new PartialChestResetJob(zone, War.war.getWarConfig().getInt(WarConfig.RESETSPEED));
 			job.runTask(War.war);
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to reset warzone - cannot get count of saved blocks", e);

@@ -1,15 +1,8 @@
 package com.tommytony.war.event;
 
-import com.tommytony.war.Team;
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.WarConfig;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.Monument;
-import com.tommytony.war.utility.Compat;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,13 +13,26 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.tommytony.war.Team;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.Monument;
+import com.tommytony.war.utility.Compat;
 
 /**
  *
@@ -272,10 +278,12 @@ public class WarBlockListener implements Listener {
 					Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
 					if (lostFlagTeam.getPlayers().size() != 0) {
 						// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
-						ItemStack teamKindBlock = lostFlagTeam.getKind().getBlockHead();
+						ItemStack teamKindFlag = new ItemStack(lostFlagTeam.getKind().getFlag());
 						player.getInventory().clear();
-						player.getInventory().addItem(teamKindBlock);
+						player.getInventory().addItem(teamKindFlag);
 						warzone.addFlagThief(lostFlagTeam, player);
+						player.getInventory().setHelmet(teamKindFlag);
+						
 						block.setType(Material.AIR);
 						for (Team t : warzone.getTeams()) {
 							t.teamcast("zone.steal.flag.broadcast", team.getKind().getColor() + player.getName() + ChatColor.WHITE, lostFlagTeam.getName());

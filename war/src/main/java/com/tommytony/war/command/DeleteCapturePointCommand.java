@@ -54,6 +54,7 @@ public class DeleteCapturePointCommand extends AbstractZoneMakerCommand {
 
 		CapturePoint cp = zone.getCapturePoint(this.args[0]);
 		if (cp != null) {
+			cp.removeArmorstand();
 			cp.getVolume().resetBlocks();
 			zone.getCapturePoints().remove(cp);
 			WarzoneYmlMapper.save(zone);

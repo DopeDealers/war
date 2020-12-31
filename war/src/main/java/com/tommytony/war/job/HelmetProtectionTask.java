@@ -33,7 +33,7 @@ public class HelmetProtectionTask implements Runnable {
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 						teamBlockMaterial = team.getKind().getMaterial();
 						// 1) Replace missing block head
-						if (playerInv.getHelmet() == null || playerInv.getHelmet().getType() != Material.LEATHER_HELMET) {
+						if ((playerInv.getHelmet() == null || playerInv.getHelmet().getType() != Material.LEATHER_HELMET) && !zone.isFlagThief(player)) {
 							playerInv.setHelmet(team.getKind().getHat());
 						}
 						
@@ -68,7 +68,7 @@ public class HelmetProtectionTask implements Runnable {
 						player.getInventory().setItemInMainHand(null);
 						player.getInventory().setItemInOffHand(null);
 						player.getInventory().setHeldItemSlot(0);
-						player.getInventory().addItem(new ItemStack(victim.getKind().getMaterial(), 2240));
+						player.getInventory().addItem(new ItemStack(victim.getKind().getFlag(), 2240));
 					} else if (zone.isBombThief(player)) {
 						player.getInventory().setItemInMainHand(null);
 						player.getInventory().setItemInOffHand(null);

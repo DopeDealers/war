@@ -13,14 +13,15 @@ public enum TeamConfig {
 	SATURATION (Integer.class, "Saturation", "Set player saturation to this level after each death"),
 	SPAWNSTYLE (TeamSpawnStyle.class, "Spawn Style", "Sets the type spawn point\nOptions: small, big, flat, invisible"),
 	TEAMSIZE (Integer.class, "Team Size", "Maximum players that may play on a team"),
+	TEAMDIFFERENCE (Integer.class, "Team Difference", "Maximum player difference between teams"),
 	PERMISSION (String.class, "Required Permission", "Only allow players with a certain permission to join a team"),
 	XPKILLMETER (Boolean.class, "XP Kill Meter", "Use the XP bar to count kills"),
 	KILLSTREAK (Boolean.class, "Killstreak Rewards", "Reward players for kills based on war.yml configuration"),
 	BLOCKWHITELIST (String.class, "Block Whitelist", "Comma-separated list of blocks players may break or place, 'all' removes this limit"),
 	PLACEBLOCK (Boolean.class, "Place Blocks", "If true, players can place blocks"),
-	APPLYPOTION(String.class, "Apply Potion Effect", "Give players a potion effect after each death, Format: EFFECT;DURATION;STRENGTH"),
-	ECOREWARD(Double.class, "Economy Reward", "Give the winning team this much money, requires Vault plugin"),
-	INVENTORYDROP(Boolean.class, "Drop Inventory", "If true, players will drop items on death"),
+	APPLYPOTION (String.class, "Apply Potion Effect", "Give players a potion effect after each death, Format: EFFECT;DURATION;STRENGTH"),
+	ECOREWARD (Double.class, "Economy Reward", "Give the winning team this much money, requires Vault plugin"),
+	INVENTORYDROP (Boolean.class, "Drop Inventory", "If true, players will drop items on death"),
 	BORDERDROP(Boolean.class, "Drop Near Border", "If true, players can drop items near the border\nUsually enabled to prevent duping");
 	
 	private final Class<?> configType;

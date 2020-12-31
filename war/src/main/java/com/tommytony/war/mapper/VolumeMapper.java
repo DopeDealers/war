@@ -57,7 +57,7 @@ public class VolumeMapper {
 	 * @return Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
 	 */
-	public static int loadBlocks(Connection databaseConnection, Volume volume, int start, int total, boolean[][][] changes, boolean inMemory, String prefix) throws SQLException {
+	public static int loadBlocks(Connection databaseConnection, Volume volume, int start, int total, boolean[][][] changes, boolean inMemory, String prefix, boolean chest) throws SQLException {
 		Validate.isTrue(!databaseConnection.isClosed());
 		if (inMemory) {
 			volume.getBlocks().clear();
@@ -82,6 +82,11 @@ public class VolumeMapper {
 			if (changes != null) {
 				changes[xi][yi][zi] = true;
 			}
+			
+			if(chest && !relative.getType().name().toUpperCase().contains("CHEST")) {
+				continue;
+			}
+			
 			BlockState modify = relative.getState();
 			// Load information from database, or null if not set
 			String type = stringCache.get(query.getInt("type"));
@@ -453,7 +458,7 @@ public class VolumeMapper {
 				throw new IllegalStateException(String.format("Unsupported volume format (was already converted to version: %d, current format: %d)", version, DATABASE_VERSION));
 		}
 		loadCorners(databaseConnection, v, world, "");
-		loadBlocks(databaseConnection, v, 0, 0, null, true, "");
+		loadBlocks(databaseConnection, v, 0, 0, null, true, "", false);
 		return v;
 	}
 

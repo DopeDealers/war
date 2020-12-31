@@ -1,5 +1,50 @@
 package com.tommytony.war.event;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Effect;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.Event.Result;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -17,29 +62,6 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.volume.Volume;
-import org.apache.commons.lang.Validate;
-import org.bukkit.*;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.*;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -66,6 +88,50 @@ public class WarPlayerListener implements Listener {
 				War.war.removeWandBearer(player);
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onPotionThrow(final PlayerInteractEvent event) {
+		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
+			return;
+		}
+		if(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
+			return;
+		}
+		ItemStack item = event.getItem();
+		if(item == null) {
+			return;
+		}
+		Boolean isNade = false;
+		if(item.getItemMeta().getDisplayName().toLowerCase().contains("nade") || item.getItemMeta().getDisplayName().toLowerCase().contains("bang")) {
+			isNade = true;
+		}
+		if(!isNade || (!item.getType().name().toLowerCase().contains("splash") && !item.getType().name().toLowerCase().contains("lingering"))) {
+			if(item.getType().name().toLowerCase().contains("potion") && isNade) { //If air-click and potion
+				event.setCancelled(true);
+			}
+			return;
+		}		
+		Location loc = event.getPlayer().getLocation();
+		loc.add(0,1.75,0);
+		
+		final ThrownPotion pot = (ThrownPotion) loc.getWorld().spawnEntity(loc,EntityType.SPLASH_POTION);
+		pot.setItem(item);
+		
+		final Vector vel = event.getPlayer().getEyeLocation().getDirection();
+		double yMul = 1.5;
+		if(vel.getY() > 1) {
+			yMul = 2.5;
+		}
+		vel.multiply(new Vector(1.5,yMul,1.5));
+		pot.setVelocity(vel);
+		
+		if(event.getPlayer().getGameMode() != GameMode.CREATIVE) {	
+			event.getItem().setAmount(event.getItem().getAmount()-1);
+		}
+		
+		event.setCancelled(true);
+		return;
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -578,7 +644,7 @@ public class WarPlayerListener implements Listener {
 				
 				// smoky
 				if (System.currentTimeMillis() % 13 == 0) {
-					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
+					playerWarzone.getWorld().playEffect(player.getLocation().clone().add(0,2,0), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
 				}
 				
 				// Make sure game ends can't occur simultaneously. 
@@ -733,7 +799,7 @@ public class WarPlayerListener implements Listener {
 			if (playerWarzone.isCakeThief(player)) {
 				// smoky
 				if (System.currentTimeMillis() % 13 == 0) {
-					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
+					playerWarzone.getWorld().playEffect(player.getLocation().clone().add(0,2,0), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
 				}
 				
 				// Make sure game ends can't occur simultaneously. 

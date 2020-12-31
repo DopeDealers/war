@@ -8,31 +8,35 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public enum TeamKind {
-	WHITE (DyeColor.WHITE, Material.WHITE_WOOL, ChatColor.WHITE, 450),
-	ORANGE (DyeColor.ORANGE, Material.ORANGE_WOOL, ChatColor.GOLD, 51),
-	MAGENTA (DyeColor.MAGENTA, Material.MAGENTA_WOOL, ChatColor.LIGHT_PURPLE, 353),
-	BLUE (DyeColor.LIGHT_BLUE, Material.LIGHT_BLUE_WOOL, ChatColor.BLUE, 23),
-	GOLD (DyeColor.YELLOW, Material.YELLOW_WOOL, ChatColor.YELLOW, 403), // yellow = gold
-	GREEN (DyeColor.LIME, Material.LIME_WOOL, ChatColor.GREEN, 612),
-	PINK (DyeColor.PINK, Material.PINK_WOOL, ChatColor.LIGHT_PURPLE, 929),
-	GRAY (DyeColor.GRAY, Material.GRAY_WOOL, ChatColor.DARK_GRAY, 600),
-	IRON (DyeColor.GRAY, Material.GRAY_WOOL, ChatColor.GRAY, 154), // lightgrey = iron
-	DIAMOND (DyeColor.CYAN, Material.CYAN_WOOL, ChatColor.DARK_AQUA, 738), // cyan = diamond
-	PURPLE (DyeColor.PURPLE, Material.PURPLE_WOOL, ChatColor.DARK_PURPLE, 153),
-	NAVY (DyeColor.BLUE, Material.BLUE_WOOL, ChatColor.DARK_BLUE, 939),
-	BROWN (DyeColor.BROWN, Material.BROWN_WOOL, ChatColor.DARK_RED, 908),
-	DARKGREEN (DyeColor.GREEN, Material.GREEN_WOOL, ChatColor.DARK_GREEN, 612),
-	RED (DyeColor.RED, Material.RED_WOOL, ChatColor.RED, 245),
-	BLACK (DyeColor.BLACK, Material.BLACK_WOOL, ChatColor.BLACK, 0);
+	WHITE (DyeColor.WHITE, Material.WHITE_CONCRETE, Material.WHITE_BANNER, Material.WHITE_STAINED_GLASS, ChatColor.WHITE, 450),
+	ORANGE (DyeColor.ORANGE, Material.ORANGE_CONCRETE, Material.ORANGE_BANNER, Material.ORANGE_STAINED_GLASS, ChatColor.GOLD, 51),
+	MAGENTA (DyeColor.MAGENTA, Material.MAGENTA_CONCRETE, Material.MAGENTA_BANNER, Material.MAGENTA_STAINED_GLASS, ChatColor.LIGHT_PURPLE, 353),
+	BLUE (DyeColor.LIGHT_BLUE, Material.LIGHT_BLUE_CONCRETE, Material.LIGHT_BLUE_BANNER, Material.LIGHT_BLUE_STAINED_GLASS, ChatColor.BLUE, 23),
+	GOLD (DyeColor.YELLOW, Material.YELLOW_CONCRETE, Material.YELLOW_BANNER, Material.YELLOW_STAINED_GLASS, ChatColor.YELLOW, 403), // yellow = gold
+	GREEN (DyeColor.LIME, Material.LIME_CONCRETE, Material.LIME_BANNER, Material.LIME_STAINED_GLASS, ChatColor.GREEN, 612),
+	PINK (DyeColor.PINK, Material.PINK_CONCRETE, Material.PINK_BANNER, Material.PINK_STAINED_GLASS, ChatColor.LIGHT_PURPLE, 929),
+	GRAY (DyeColor.GRAY, Material.GRAY_CONCRETE, Material.GRAY_BANNER, Material.GRAY_STAINED_GLASS, ChatColor.DARK_GRAY, 600),
+	IRON (DyeColor.GRAY, Material.GRAY_CONCRETE, Material.GRAY_BANNER, Material.GRAY_STAINED_GLASS, ChatColor.GRAY, 154), // lightgrey = iron
+	DIAMOND (DyeColor.CYAN, Material.CYAN_CONCRETE, Material.CYAN_BANNER, Material.CYAN_STAINED_GLASS, ChatColor.DARK_AQUA, 738), // cyan = diamond
+	PURPLE (DyeColor.PURPLE, Material.PURPLE_CONCRETE, Material.PURPLE_BANNER, Material.PURPLE_STAINED_GLASS, ChatColor.DARK_PURPLE, 153),
+	NAVY (DyeColor.BLUE, Material.BLUE_CONCRETE, Material.BLUE_BANNER, Material.BLUE_STAINED_GLASS, ChatColor.DARK_BLUE, 939),
+	BROWN (DyeColor.BROWN, Material.BROWN_CONCRETE, Material.BROWN_BANNER, Material.BROWN_STAINED_GLASS, ChatColor.DARK_RED, 908),
+	DARKGREEN (DyeColor.GREEN, Material.GREEN_CONCRETE, Material.GREEN_BANNER, Material.GREEN_STAINED_GLASS, ChatColor.DARK_GREEN, 612),
+	RED (DyeColor.RED, Material.RED_CONCRETE, Material.RED_BANNER, Material.RED_STAINED_GLASS, ChatColor.RED, 245),
+	BLACK (DyeColor.BLACK, Material.BLACK_CONCRETE, Material.BLACK_BANNER, Material.BLACK_STAINED_GLASS, ChatColor.BLACK, 0);
 
 	private final DyeColor dyeColor;
 	private final ChatColor chatColor;
 	private final Material material;
+	private final Material flag;
+	private final Material glass;
 	private final int potionEffectColor;
 
-	TeamKind(DyeColor blockHeadColor, Material material, ChatColor color, int potionEffectColor) {
+	TeamKind(DyeColor blockHeadColor, Material material, Material flag, Material glass, ChatColor color, int potionEffectColor) {
 		this.dyeColor = blockHeadColor;
 		this.material = material;
+		this.flag = flag;
+		this.glass = glass;
 		this.chatColor = color;
 		this.potionEffectColor = potionEffectColor;
 	}
@@ -57,9 +61,9 @@ public enum TeamKind {
 	}
 
 	/**
-	 * Get wool block data for the dye color.
+	 * Get CONCRETE block data for the dye color.
 	 * @deprecated TODO remove all spout craft support
-	 * @return wool color data value
+	 * @return CONCRETE color data value
 	 */
 	public byte getData() {
 		return this.dyeColor.getWoolData();
@@ -75,9 +79,9 @@ public enum TeamKind {
 	}
 
 	/**
-	 * Get the color of the wool block as a bukkit color.
+	 * Get the color of the CONCRETE block as a bukkit color.
 	 *
-	 * @return wool block color.
+	 * @return CONCRETE block color.
 	 */
 	public org.bukkit.Color getBukkitColor() {
 		return this.dyeColor.getColor();
@@ -90,6 +94,14 @@ public enum TeamKind {
 	 */
 	public Material getMaterial() {
 		return this.material;
+	}
+	
+	public Material getFlag() {
+		return this.flag;
+	}
+	
+	public Material getGlass() {
+		return this.glass;
 	}
 
 	@Override
@@ -107,7 +119,7 @@ public enum TeamKind {
 	}
 
 	/**
-	 * Get a single item of this team's wool head block.
+	 * Get a single item of this team's CONCRETE head block.
 	 *
 	 * @return single block head item.
 	 */
@@ -118,7 +130,7 @@ public enum TeamKind {
 	/**
 	 * Check if a block is this team's color block.
 	 *
-	 * @param block Wool block to check.
+	 * @param block CONCRETE block to check.
 	 * @return true if block is this team's color.
 	 */
 	public boolean isTeamBlock(BlockState block) {
@@ -128,7 +140,7 @@ public enum TeamKind {
 	/**
 	 * Check if an item is this team's color block.
 	 *
-	 * @param item Wool item to check.
+	 * @param item CONCRETE item to check.
 	 * @return true if item is this team's color.
 	 */
 	public boolean isTeamItem(ItemStack item) {

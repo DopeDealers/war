@@ -20,12 +20,15 @@ public enum WarzoneConfig {
 	RESETONLOAD (Boolean.class, "Reset on Load", "If true, reset warzone when the server starts"),
 	RESETONUNLOAD (Boolean.class, "Reset on Unload", "If true, reset warzone when the server stops"),
 	UNBREAKABLE (Boolean.class, "Unbreakable Blocks", "If true, prevent block breaking"),
+	GAMEMODE(String.class, "Gamemode", "The gamemode that is played in"),
 	JOINMIDBATTLE (Boolean.class, "Join Mid-Battle", "If true, players are allowed to join during a battle"),
 	AUTOJOIN (Boolean.class, "Auto-Join", "If true, bypass the zone lobby and auto-assign the player a team"),
 	SCOREBOARD (ScoreboardType.class, "Scoreboard Type", "Type of scoreboard for this zone\nOptions: none, points, lifepool, top kills"),
 	SOUPHEALING (Boolean.class, "Soup Healing", "If true, allow players to heal by consuming soup"),
 	ALLOWENDER (Boolean.class, "Allow Ender Chests", "If true, ender chests are allowed\nEnder chests are usually blocked to prevent item duplication"),
 	RESETBLOCKS (Boolean.class, "Reset Blocks", "If true, reset warzone blocks each battle"),
+	ONLYRESETCHESTS (Boolean.class, "Reset Blocks", "If true, only chests will be reset"),
+	CPRADIUS (Integer.class, "CapturePoint-Radius", "Defines the Capture-Point-Radius"),
 	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point"),
 	PREPTIME(Integer.class, "Preparation Time", "Time, in seconds, before players are allowed to fight");
 	

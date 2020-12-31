@@ -84,7 +84,7 @@ public class Team {
 		int z = teamSpawn.getBlockZ();
 
 		TeamSpawnStyle style = this.getTeamConfig().resolveSpawnStyle();
-		if (style.equals(TeamSpawnStyle.INVISIBLE)) {
+		if (style.equals(TeamSpawnStyle.INVISIBLE) || style.equals(TeamSpawnStyle.NONE) || style.equals(TeamSpawnStyle.MINIMAL)) {
 			spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x, y - 1, z));
 			spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x, y + 3, z));
 		} else if (style.equals(TeamSpawnStyle.SMALL)) {
@@ -112,7 +112,7 @@ public class Team {
 		ItemStack light = this.warzone.getWarzoneMaterials().getLightBlock();
 
 		TeamSpawnStyle style = this.getTeamConfig().resolveSpawnStyle();
-		if (!style.equals(TeamSpawnStyle.INVISIBLE)) {
+		if (!style.equals(TeamSpawnStyle.INVISIBLE) && !style.equals(TeamSpawnStyle.NONE) && !style.equals(TeamSpawnStyle.MINIMAL)) {
 			// first ring
 			this.setBlock(x + 1, y - 1, z + 1, this.kind);
 			this.setBlock(x + 1, y - 1, z, this.kind);
@@ -153,7 +153,12 @@ public class Team {
 				signDirection = BlockFace.SOUTH_EAST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH()).getRelative(Direction.WEST());
 			}
-		} else if (!style.equals(TeamSpawnStyle.INVISIBLE)) {
+		} else if (style.equals(TeamSpawnStyle.MINIMAL)) {
+			BlockState lightBlock = this.warzone.getWorld().getBlockAt(x, y - 1, z).getState();
+			lightBlock.setType(light.getType());
+			lightBlock.setData(light.getData());
+			lightBlock.update(true);
+		} else if (!style.equals(TeamSpawnStyle.INVISIBLE) && !style.equals(TeamSpawnStyle.NONE)) {
 			// outer ring (FLAT or BIG)
 			this.setBlock(x + 2, y - 1, z + 2, this.kind);
 			this.setBlock(x + 2, y - 1, z + 1, this.kind);
@@ -566,60 +571,15 @@ public class Team {
 		current.update(true);
 
 		// flag
-		BlockState flagBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z).getState();
-		flagBlock.setType(this.kind.getMaterial());
+		BlockState flagBlock = this.warzone.getWorld().getBlockAt(x, y, z).getState();
+		flagBlock.setType(this.kind.getFlag());
 		flagBlock.update(true);
-
-		// Flag post using Orientation
-		int yaw = 0;
-		if (this.teamFlag.getYaw() >= 0) {
-			yaw = (int) (this.teamFlag.getYaw() % 360);
-		} else {
-			yaw = (int) (360 + (this.teamFlag.getYaw() % 360));
-		}
-		if ((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
-			current = this.warzone.getWorld().getBlockAt(x, y, z - 1).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-			current = this.warzone.getWorld().getBlockAt(x, y + 1, z - 1).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-		} else if (yaw >= 45 && yaw < 135) {
-			current = this.warzone.getWorld().getBlockAt(x + 1, y, z).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-			current = this.warzone.getWorld().getBlockAt(x + 1, y + 1, z).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-		} else if (yaw >= 135 && yaw < 225) {
-			current = this.warzone.getWorld().getBlockAt(x, y, z + 1).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-			current = this.warzone.getWorld().getBlockAt(x, y + 1, z + 1).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-		} else if (yaw >= 225 && yaw < 315) {
-			current = this.warzone.getWorld().getBlockAt(x - 1, y, z).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-			current = this.warzone.getWorld().getBlockAt(x - 1, y + 1, z).getState();
-			current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-			current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-			current.update(true);
-		}
 	}
 
 	public boolean isTeamFlagBlock(Block block) {
 		if (this.teamFlag != null) {
 			int flagX = this.teamFlag.getBlockX();
-			int flagY = this.teamFlag.getBlockY() + 1;
+			int flagY = this.teamFlag.getBlockY();
 			int flagZ = this.teamFlag.getBlockZ();
 			if (block.getX() == flagX && block.getY() == flagY && block.getZ() == flagZ) {
 				return true;

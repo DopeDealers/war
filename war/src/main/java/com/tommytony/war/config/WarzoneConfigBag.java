@@ -73,6 +73,15 @@ public class WarzoneConfigBag {
 			return War.war.getWarzoneDefaultConfig().getInt(config);
 		}
 	}
+	
+	public String getString(WarzoneConfig config) {
+		if (bag.containsKey(config)) {
+			return (String)bag.get(config);
+		} else {
+			// use War default config
+			return War.war.getWarzoneDefaultConfig().getString(config);
+		}
+	}
 
 	public Boolean getBoolean(WarzoneConfig config) {
 		if (bag.containsKey(config)) {
@@ -137,6 +146,9 @@ public class WarzoneConfigBag {
 				if (warzoneConfig.getConfigType().equals(Integer.class)) {
 					int intValue = Integer.parseInt(namedParams.get(namedParam));
 					this.bag.put(warzoneConfig, intValue);
+				} else if (warzoneConfig.getConfigType().equals(String.class)) {
+					String stringValue = namedParams.get(namedParam);
+					this.bag.put(warzoneConfig, stringValue);
 				} else if (warzoneConfig.getConfigType().equals(Boolean.class)) {
 					String onOff = namedParams.get(namedParam);
 					this.bag.put(warzoneConfig, onOff.equals("on") || onOff.equals("true"));
@@ -147,7 +159,7 @@ public class WarzoneConfigBag {
 				} else if (warzoneConfig.getConfigType().equals(ScoreboardType.class)) {
 					String type = namedParams.get(namedParam);
 					this.bag.put(warzoneConfig, ScoreboardType.getFromString(type));
-				}
+				} 
 				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam);
 			} else if (namedParam.equals("delete")) {
 				String toDelete = namedParams.get(namedParam);

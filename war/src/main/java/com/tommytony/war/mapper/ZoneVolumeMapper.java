@@ -83,7 +83,11 @@ public class ZoneVolumeMapper extends VolumeMapper {
 	 * @throws SQLException Error communicating with SQLite3 database
 	 */
 	public static int reloadZoneBlocks(Connection databaseConnection, ZoneVolume volume, int start, int total, boolean[][][] changes) throws SQLException {
-		return loadBlocks(databaseConnection, volume, start, total, changes, false, "");
+		return loadBlocks(databaseConnection, volume, start, total, changes, false, "", false);
+	}
+	
+	public static int reloadZoneChests(Connection databaseConnection, ZoneVolume volume, int start, int total, boolean[][][] changes) throws SQLException {
+		return loadBlocks(databaseConnection, volume, start, total, changes, false, "", true);
 	}
 
 
@@ -98,7 +102,7 @@ public class ZoneVolumeMapper extends VolumeMapper {
 		World world = volume.getWorld();
 		Validate.notNull(world, String.format("Cannot find the warzone for %s", prefix));
 		loadCorners(databaseConnection, volume, world, prefix);
-		loadBlocks(databaseConnection, volume, 0, 0, null, true, prefix);
+		loadBlocks(databaseConnection, volume, 0, 0, null, true, prefix, false);
 	}
 
 	/**

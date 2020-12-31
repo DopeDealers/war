@@ -1,32 +1,43 @@
 package com.tommytony.war;
 
-import com.google.common.collect.ImmutableList;
-import com.tommytony.war.config.*;
-import com.tommytony.war.event.WarBattleWinEvent;
-import com.tommytony.war.event.WarPlayerLeaveEvent;
-import com.tommytony.war.event.WarPlayerThiefEvent;
-import com.tommytony.war.event.WarScoreCapEvent;
-import com.tommytony.war.job.InitZoneJob;
-import com.tommytony.war.job.LoadoutResetJob;
-import com.tommytony.war.job.LogKillsDeathsJob;
-import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
-import com.tommytony.war.job.ZoneTimeJob;
-import com.tommytony.war.mapper.LoadoutYmlMapper;
-import com.tommytony.war.mapper.ZoneVolumeMapper;
-import com.tommytony.war.structure.*;
-import com.tommytony.war.utility.*;
-import com.tommytony.war.volume.Volume;
-import com.tommytony.war.volume.ZoneVolume;
-import net.milkbowl.vault.economy.EconomyResponse;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -43,13 +54,42 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.logging.Level;
+import com.google.common.collect.ImmutableList;
+import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamConfigBag;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.config.WarzoneConfigBag;
+import com.tommytony.war.event.WarBattleWinEvent;
+import com.tommytony.war.event.WarPlayerLeaveEvent;
+import com.tommytony.war.event.WarPlayerThiefEvent;
+import com.tommytony.war.event.WarScoreCapEvent;
+import com.tommytony.war.job.InitZoneJob;
+import com.tommytony.war.job.LoadoutResetJob;
+import com.tommytony.war.job.LogKillsDeathsJob;
+import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
+import com.tommytony.war.job.ZoneTimeJob;
+import com.tommytony.war.mapper.LoadoutYmlMapper;
+import com.tommytony.war.mapper.ZoneVolumeMapper;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.CapturePoint;
+import com.tommytony.war.structure.HubLobbyMaterials;
+import com.tommytony.war.structure.Monument;
+import com.tommytony.war.structure.WarzoneMaterials;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.structure.ZoneWallGuard;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.Loadout;
+import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.PlayerState;
+import com.tommytony.war.utility.PotionEffectHelper;
+import com.tommytony.war.volume.Volume;
+import com.tommytony.war.volume.ZoneVolume;
+
+import net.milkbowl.vault.economy.EconomyResponse;
 
 /**
  *
@@ -82,6 +122,8 @@ public class Warzone {
 	private Location teleport;
 	private ZoneLobby lobby;
 	private Location rallyPoint;
+	public Scoreboard board = null;
+	public Objective teamDisplay = null;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
 	private HashMap<UUID, Team> flagThieves = new HashMap<UUID, Team>();
@@ -96,12 +138,12 @@ public class Warzone {
 	private InventoryBag defaultInventories = new InventoryBag();
 
 	private Scoreboard scoreboard;
-	
+
 	private HubLobbyMaterials lobbyMaterials = null;
 	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(
 			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.OAK_FENCE),
 			new ItemStack(Material.GLOWSTONE));
-	
+
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
 	//private final Object gameEndLock = new Object();
@@ -123,6 +165,16 @@ public class Warzone {
 		this.scoreboardType = this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
 		if (scoreboardType == ScoreboardType.SWITCHING)
 			scoreboardType = ScoreboardType.LIFEPOOL;
+
+		Bukkit.getScheduler().runTask(War.war, new Runnable(){
+
+			@Override
+			public void run() {
+				board = War.war.getServer().getScoreboardManager().getNewScoreboard();
+				teamDisplay = board.registerNewObjective(" ", "dummy"," ");
+				teamDisplay.setDisplaySlot(DisplaySlot.BELOW_NAME);
+				return;
+			}});
 	}
 
 	public static Warzone getZoneByName(String name) {
@@ -358,7 +410,8 @@ public class Warzone {
 		// reset capture points
 		for (CapturePoint cp : this.capturePoints) {
 			cp.getVolume().resetBlocks();
-			cp.reset();
+			cp.reset(this);
+			cp.setRadius(this.getWarzoneConfig().getInt(WarzoneConfig.CPRADIUS));
 		}
 
 		// reset bombs
@@ -487,9 +540,22 @@ public class Warzone {
 
 		this.setKillCount(player.getName(), 0);
 
-		if (player.getGameMode() != GameMode.SURVIVAL) {
-			// Players are always in survival mode in warzones
-			player.setGameMode(GameMode.SURVIVAL);
+		String gm = this.getWarzoneConfig().getString(WarzoneConfig.GAMEMODE).toUpperCase();
+		if (!player.getGameMode().toString().toUpperCase().contains(gm)) {
+			switch(gm) {
+				case "ADVENTURE":
+					player.setGameMode(GameMode.ADVENTURE);
+					break;
+				case "CREATIVE":
+					player.setGameMode(GameMode.CREATIVE);
+					break;
+				case "SPECTATOR":
+					player.setGameMode(GameMode.SPECTATOR);
+					break;
+				default:
+					player.setGameMode(GameMode.SURVIVAL);
+					break;
+			}
 		}
 
 
@@ -987,7 +1053,7 @@ public class Warzone {
 	public void setLobby(ZoneLobby lobby) {
 		this.lobby = lobby;
 	}
-	
+
 	public Team autoAssign(Player player) {
 		Collections.sort(teams, LEAST_PLAYER_COUNT_ORDER);
 		Team lowestNoOfPlayers = null;
@@ -1020,6 +1086,25 @@ public class Warzone {
 		if (player.getWorld() != this.getWorld()) {
 			player.teleport(this.getWorld().getSpawnLocation());
 		}
+
+		Team smallestOpponent = null;
+
+		for(Team cTeam : this.teams) {
+			if(cTeam.equals(team)) {
+				continue;
+			}
+			if(smallestOpponent == null) {
+				smallestOpponent = cTeam;
+			} else if(cTeam.getPlayers().size() < smallestOpponent.getPlayers().size()) {
+				smallestOpponent = cTeam;
+			}
+		}
+
+		if (((team.getPlayers().size() + 1) - smallestOpponent.getPlayers().size()) > team.getTeamConfig().resolveInt(TeamConfig.TEAMDIFFERENCE)) {
+			War.war.badMsg(player, "join.unfair");
+			return false;
+		}
+
 		PermissionAttachment attachment = player.addAttachment(War.war);
 		this.attachments.put(player, attachment);
 		attachment.setPermission("war.playing", true);
@@ -1039,7 +1124,7 @@ public class Warzone {
 		this.tryCallDelayedPlayers();
 		return true;
 	}
-	
+
 	private void dropItems(Location location, ItemStack[] items) {
 		for (ItemStack item : items) {
 			if (item == null || item.getType() == Material.AIR) {
@@ -1048,7 +1133,7 @@ public class Warzone {
 			location.getWorld().dropItem(location, item);
 		}
 	}
-	
+
 	/**
 	 * Send death messages and process other records before passing off the
 	 * death to the {@link #handleDeath(Player)} method.
@@ -1149,7 +1234,7 @@ public class Warzone {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Handle death messages before passing to {@link #handleDeath(Player)}
 	 * for post-processing. It's like
@@ -1244,8 +1329,10 @@ public class Warzone {
 		this.getKillsDeathsTracker().clear();
 		if (!detectScoreCap()) {
 			this.broadcast("zone.battle.reset");
-			if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+			if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS) && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
 				this.reinitialize();
+			} else if(this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
+				this.resetChests();
 			} else {
 				this.initializeZone();
 			}
@@ -1273,6 +1360,11 @@ public class Warzone {
 		this.getVolume().resetBlocksAsJob();
 	}
 
+	public void resetChests() {
+		this.isReinitializing = true;
+		this.getVolume().resetChestsAsJob();
+	}
+
 	public void handlePlayerLeave(Player player, Location destination, PlayerMoveEvent event, boolean removeFromTeam) {
 		this.handlePlayerLeave(player);
 		event.setTo(destination);
@@ -1297,7 +1389,13 @@ public class Warzone {
 					team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				}
 				if (!this.isReinitializing()) {
-					this.reinitialize();
+					if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS) && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
+						this.reinitialize();
+					} else if(this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
+						this.resetChests(); //MARK - Is in here
+					} else {
+						this.initializeZone();
+					}
 					War.war.getLogger().log(Level.INFO, "Last player left warzone {0}. Warzone blocks resetting automatically...", new Object[] {this.getName()});
 				}
 			}
@@ -1442,7 +1540,7 @@ public class Warzone {
 	public Bomb getBombForThief(Player thief) {
 		return this.bombThieves.get(thief.getUniqueId());
 	}
-	
+
 	// Cake
 
 	public void removeBombThief(Player thief) {
@@ -1525,8 +1623,10 @@ public class Warzone {
 			t.getPlayers().clear(); // empty the team
 			t.resetSign();
 		}
-		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS) && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
 			this.reinitialize();
+		} else if(this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
+			this.resetChests();
 		} else {
 			this.initializeZone();
 		}
@@ -1653,11 +1753,11 @@ public class Warzone {
 		// if no authors, all zonemakers can edit the zone
 		return authors.size() == 0 || authors.contains(player.getName());
 	}
-		
+
 	public void addAuthor(String playerName) {
 		authors.add(playerName);
 	}
-	
+
 	public List<String> getAuthors() {
 		return this.authors;
 	}
@@ -1673,8 +1773,8 @@ public class Warzone {
 	public void equipPlayerLoadoutSelection(Player player, Team playerTeam, boolean isFirstRespawn, boolean isToggle) {
 		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
 		if (selection != null && !this.isRespawning(player) && playerTeam.getPlayers().contains(player)) {
-			// Make sure that inventory resets dont occur if player has already tp'ed out (due to game end, or somesuch) 
-			// - repawn timer + this method is why inventories were getting wiped as players exited the warzone. 
+			// Make sure that inventory resets dont occur if player has already tp'ed out (due to game end, or somesuch)
+			// - repawn timer + this method is why inventories were getting wiped as players exited the warzone.
 			List<Loadout> loadouts = playerTeam.getInventories().resolveNewLoadouts();
 			List<String> sortedNames = LoadoutYmlMapper.sortNames(Loadout.toLegacyFormat(loadouts));
 			sortedNames.remove("first");
@@ -1748,16 +1848,16 @@ public class Warzone {
 			if (originalState.getHelmet() != null) {
 				playerItems.put(103, originalState.getHelmet());
 			}
-			
+
 		}
-		
+
 		return playerItems;
 	}
 
 	public WarzoneConfigBag getWarzoneConfig() {
 		return this.warzoneConfig;
 	}
-	
+
 	public TeamConfigBag getTeamDefaultConfig() {
 		return this.teamDefaultConfig;
 	}
@@ -2124,7 +2224,7 @@ public class Warzone {
 	public boolean getPvpReady() {
 		return this.pvpReady;
 	}
-	
+
 	public void setPvpReady(boolean ready) {
 		this.pvpReady = ready;
 	}

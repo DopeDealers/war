@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
 import com.tommytony.war.job.BlockResetJob;
+import com.tommytony.war.job.ChestResetJob;
 import com.tommytony.war.utility.Direction;
 
 /**
@@ -87,6 +88,19 @@ public class Volume {
 	public void resetBlocks() {
 		for (BlockState state : this.blocks) {
 			state.update(true, false);
+		}
+	}
+	
+	public void resetChestsAsJob() {
+		ChestResetJob job = new ChestResetJob(this);
+		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+	}
+	
+	public void resetChests() {
+		for (BlockState state : this.blocks) {
+			if(state.getType().name().toUpperCase().contains("CHEST")) {
+				state.update(true, false);
+			}
 		}
 	}
 

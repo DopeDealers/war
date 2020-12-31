@@ -1,14 +1,21 @@
 package com.tommytony.war.structure;
 
-import com.tommytony.war.Warzone;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.volume.Volume;
+import java.util.Collection;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-import org.bukkit.util.Vector;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+
+import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.volume.Volume;
+
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * Capture points
@@ -18,29 +25,10 @@ import org.bukkit.util.Vector;
 public class CapturePoint {
 	private static int[][][] structure = {
 			{
-					{1, 1, 1},
-					{1, 2, 1},
-					{1, 1, 1}
+				{0}
 			},
 			{
-					{0, 0, 0},
-					{0, 3, 0},
-					{0, 0, 0}
-			},
-			{
-					{0, 0, 0},
-					{0, 3, 0},
-					{0, 0, 0}
-			},
-			{
-					{0, 0, 0},
-					{0, 3, 0},
-					{0, 0, 0}
-			},
-			{
-					{0, 0, 0},
-					{0, 3, 0},
-					{0, 0, 0}
+				{0}
 			}
 	};
 
@@ -59,11 +47,11 @@ public class CapturePoint {
 		this.controlTime = 0;
 		this.warzone = warzone;
 		this.volume = new Volume("cp-" + name, warzone.getWorld());
-		this.setLocation(location);
+		this.setLocation(location, warzone);
 	}
 
 	private Location getOrigin() {
-		return location.clone().subtract(1, 1, 1).getBlock().getLocation();
+		return location.clone().subtract(0, 0, 0).getBlock().getLocation();
 	}
 
 	private void updateBlocks() {
@@ -79,18 +67,6 @@ public class CapturePoint {
 						case 0:
 							state.setType(Material.AIR);
 							break;
-						case 1:
-							state.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
-							state.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
-							break;
-						case 2:
-							state.setType(this.warzone.getWarzoneMaterials().getLightBlock().getType());
-							state.setData(this.warzone.getWarzoneMaterials().getLightBlock().getData());
-							break;
-						case 3:
-							state.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
-							state.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
-							break;
 						default:
 							throw new IllegalStateException("Invalid structure");
 					}
@@ -98,15 +74,61 @@ public class CapturePoint {
 				}
 			}
 		}
+		
+		ArmorStand stand = null;
+		
+		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 0.5, 0.5, 0.5);
+		for(Entity en : entities) {
+			if(en.getType().name().toUpperCase().equals("ARMOR_STAND")) {
+				stand = (ArmorStand) en;
+			}
+		}
+		
+		if(stand == null) {
+			stand = (ArmorStand) origin.getWorld().spawnEntity(origin, EntityType.ARMOR_STAND);
+			stand.setPersistent(true);
+			stand.setGravity(false);
+			stand.setInvulnerable(true);
+			stand.setCustomNameVisible(true);
+			stand.setVisible(false);
+			stand.setMarker(true);
+		}
+		
 		// Add flag block
 		if (strength > 0 && controller != null) {
-			// Make flag point direction of player when setting the capture point
-			int flagHeight = (int) (strength / (getMaxStrength() / 4.0));
-			Vector dir = new Vector(1 + -Math.round(Math.sin(Math.toRadians(location.getYaw()))), flagHeight,
-					1 + Math.round(Math.cos(Math.toRadians(location.getYaw()))));
-			BlockState state = origin.clone().add(dir).getBlock().getState();
-			state.setType(controller.getMaterial());
-			state.update(true);
+			int step = (int) (strength / (getMaxStrength() / 4.0));
+			
+			switch(step) {
+				case 4:
+					stand.setCustomName(controller.getColor()+ "100% ||||||||||||||||||||||||||||||||||||||||");
+					break;
+				case 3:
+					stand.setCustomName(controller.getColor()+ "80% ||||||||||||||||||||||||||||||||" + ChatColor.WHITE + ("||||||||"));
+					break;
+				case 2:
+					stand.setCustomName(controller.getColor()+ "60% ||||||||||||||||||||||||" + ChatColor.WHITE + ("||||||||||||||||"));
+					break;
+				case 1:
+					stand.setCustomName(controller.getColor()+ "40% ||||||||||||||||" + ChatColor.WHITE + ("||||||||||||||||||||||||"));
+					break;
+				case 0:
+					stand.setCustomName(controller.getColor()+ "20% ||||||||" + ChatColor.WHITE + ("||||||||||||||||||||||||||||||||"));
+					break;
+				default:
+					break;
+			}
+		} else {
+			stand.setCustomName(ChatColor.stripColor("0% ||||||||||||||||||||||||||||||||||||||||"));
+		}
+	}
+	
+	public void removeArmorstand() {
+		Location origin = this.getOrigin();
+		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 0.5, 0.5, 0.5);
+		for(Entity en : entities) {
+			if(en.getType().name().toUpperCase().equals("ARMOR_STAND")) {
+				en.remove();
+			}
 		}
 	}
 
@@ -118,13 +140,19 @@ public class CapturePoint {
 		return location;
 	}
 
-	public void setLocation(Location location) {
+	public void setLocation(Location location, Warzone zone) {
 		this.location = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(),
 				location.getBlockZ(), location.getYaw(), 0);
-		this.volume.setCornerOne(this.getOrigin());
-		this.volume.setCornerTwo(this.getOrigin().add(structure[0][0].length, structure.length, structure[0].length));
+		int radius = zone.getWarzoneConfig().getInt(WarzoneConfig.CPRADIUS);
+		this.volume.setCornerOne(this.getOrigin().subtract(radius,1,radius));
+		this.volume.setCornerTwo(this.getOrigin().add(radius,3,radius));
 		this.volume.saveBlocks();
 		this.updateBlocks();
+	}
+	
+	public void setRadius(int radius) {
+		this.volume.setCornerOne(this.getOrigin().subtract(radius,1,radius));
+		this.volume.setCornerTwo(this.getOrigin().add(radius,3,radius));
 	}
 
 	public TeamKind getDefaultController() {
@@ -168,13 +196,14 @@ public class CapturePoint {
 		this.volume = volume;
 	}
 
-	public void reset() {
+	public void reset(Warzone zone) {
 		this.controller = defaultController;
 		if (this.controller != null) {
 			this.strength = 4;
 		} else {
 			this.strength = 0;
 		}
+		this.setLocation(this.getOrigin(),zone);
 		this.updateBlocks();
 	}
 

@@ -172,9 +172,12 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.SCOREBOARD, ScoreboardType.NONE);
 		warzoneDefaultConfig.put(WarzoneConfig.SOUPHEALING, false);
 		warzoneDefaultConfig.put(WarzoneConfig.ALLOWENDER, true);
-		warzoneDefaultConfig.put(WarzoneConfig.RESETBLOCKS, true);
+		warzoneDefaultConfig.put(WarzoneConfig.RESETBLOCKS, false);
+		warzoneDefaultConfig.put(WarzoneConfig.ONLYRESETCHESTS, false);
 		warzoneDefaultConfig.put(WarzoneConfig.CAPTUREPOINTTIME, 15);
+		warzoneDefaultConfig.put(WarzoneConfig.CPRADIUS, 3);
 		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);
+		warzoneDefaultConfig.put(WarzoneConfig.GAMEMODE, "SURVIVAL");
 
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);
@@ -183,10 +186,11 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.MAXSCORE, 10);
 		teamDefaultConfig.put(TeamConfig.NOHUNGER, false);
 		teamDefaultConfig.put(TeamConfig.PLAYERLOADOUTASDEFAULT, false);
-		teamDefaultConfig.put(TeamConfig.RESPAWNTIMER, 0);
+		teamDefaultConfig.put(TeamConfig.RESPAWNTIMER, 1);
 		teamDefaultConfig.put(TeamConfig.SATURATION, 10);
 		teamDefaultConfig.put(TeamConfig.SPAWNSTYLE, TeamSpawnStyle.SMALL);
 		teamDefaultConfig.put(TeamConfig.TEAMSIZE, 10);
+		teamDefaultConfig.put(TeamConfig.TEAMDIFFERENCE, 1);
 		teamDefaultConfig.put(TeamConfig.PERMISSION, "war.player");
 		teamDefaultConfig.put(TeamConfig.XPKILLMETER, false);
 		teamDefaultConfig.put(TeamConfig.KILLSTREAK, false);

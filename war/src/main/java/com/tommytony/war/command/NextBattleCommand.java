@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.job.PartialZoneResetJob;
 import com.tommytony.war.structure.ZoneLobby;
 
@@ -46,7 +47,13 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 		
 		PartialZoneResetJob.setSenderToNotify(zone, this.getSender());
 		
-		zone.reinitialize();
+		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS) && !(zone.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS))) {
+			zone.reinitialize();
+		} else if(zone.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
+			zone.resetChests();
+		} else {
+			zone.initializeZone();
+		}
 		
 		War.war.log(this.getSender().getName() + " used nextbattle in warzone " + zone.getName(), Level.INFO);
 

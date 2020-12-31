@@ -50,7 +50,7 @@ public class SetCapturePointCommand extends AbstractZoneMakerCommand {
 			// move the existing capture point
 			CapturePoint cp = zone.getCapturePoint(this.args[0]);
 			cp.getVolume().resetBlocks();
-			cp.setLocation(player.getLocation());
+			cp.setLocation(player.getLocation(), zone);
 			this.msg("Capture point " + cp.getName() + " was moved.");
 			War.war.log(this.getSender().getName() + " moved capture point " + cp.getName() + " in warzone " + zone.getName(), Level.INFO);
 		} else {
