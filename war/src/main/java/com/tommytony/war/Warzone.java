@@ -89,6 +89,8 @@ import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
+import me.neznamy.tab.api.TABAPI;
+import me.neznamy.tab.api.TabPlayer;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 /**
@@ -1117,7 +1119,22 @@ public class Warzone {
 			this.playerStates.remove(player.getName());
 		}
 		this.getReallyDeadFighters().remove(player.getName());
-		this.keepPlayerState(player);
+		this.keepPlayerState(player); //MARK - Absturz-Inventar?
+
+		if(War.war.getTAB()) {
+			TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
+
+			for(Team t : this.teams) {
+				if(t != team) {
+					for(Player p : t.getPlayers()) {
+						TabPlayer tp = TABAPI.getPlayer(p.getUniqueId());
+						tp.hideNametag(player.getUniqueId());
+						tplayer.hideNametag(p.getUniqueId());
+					}
+				}
+			}
+		}
+
 		War.war.msg(player, "join.inventorystored");
 		this.respawnPlayer(team, player);
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
@@ -1378,6 +1395,19 @@ public class Warzone {
 	private void handlePlayerLeave(Player player) {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam != null) {
+			if(War.war.getTAB()) {
+				TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
+				for(Team t : this.teams) {
+					if(t != playerTeam) {
+						for(Player p : t.getPlayers()) {
+							TabPlayer tp = TABAPI.getPlayer(p.getUniqueId());
+							tp.showNametag(player.getUniqueId());
+							tplayer.showNametag(p.getUniqueId());
+						}
+					}
+				}
+			}
+
 			playerTeam.removePlayer(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
@@ -1392,7 +1422,7 @@ public class Warzone {
 					if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS) && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
 						this.reinitialize();
 					} else if(this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
-						this.resetChests(); //MARK - Is in here
+						this.resetChests();
 					} else {
 						this.initializeZone();
 					}

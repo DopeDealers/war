@@ -1,20 +1,19 @@
 package com.tommytony.war;
 
-import com.tommytony.war.command.WarCommandHandler;
-import com.tommytony.war.config.*;
-import com.tommytony.war.event.WarBlockListener;
-import com.tommytony.war.event.WarEntityListener;
-import com.tommytony.war.event.WarPlayerListener;
-import com.tommytony.war.job.CapturePointTimer;
-import com.tommytony.war.job.HelmetProtectionTask;
-import com.tommytony.war.job.ScoreboardSwitchTimer;
-import com.tommytony.war.mapper.WarYmlMapper;
-import com.tommytony.war.mapper.WarzoneYmlMapper;
-import com.tommytony.war.structure.*;
-import com.tommytony.war.ui.UIManager;
-import com.tommytony.war.utility.*;
-import com.tommytony.war.volume.Volume;
-import net.milkbowl.vault.economy.Economy;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,13 +32,46 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
+import com.tommytony.war.command.WarCommandHandler;
+import com.tommytony.war.config.FlagReturn;
+import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.KillstreakReward;
+import com.tommytony.war.config.MySQLConfig;
+import com.tommytony.war.config.ScoreboardType;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamConfigBag;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.TeamSpawnStyle;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.config.WarConfigBag;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.config.WarzoneConfigBag;
+import com.tommytony.war.config.WeaponBag;
+import com.tommytony.war.event.WarBlockListener;
+import com.tommytony.war.event.WarEntityListener;
+import com.tommytony.war.event.WarPlayerListener;
+import com.tommytony.war.job.CapturePointTimer;
+import com.tommytony.war.job.HelmetProtectionTask;
+import com.tommytony.war.job.ScoreboardSwitchTimer;
+import com.tommytony.war.mapper.WarYmlMapper;
+import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.mapper.WeaponYmlMapper;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.HubLobbyMaterials;
+import com.tommytony.war.structure.Monument;
+import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.ui.UIManager;
+import com.tommytony.war.utility.Compat;
+import com.tommytony.war.utility.Loadout;
+import com.tommytony.war.utility.PlayerState;
+import com.tommytony.war.utility.SizeCounter;
+import com.tommytony.war.utility.WarLogFormatter;
+import com.tommytony.war.utility.Weapon;
+import com.tommytony.war.volume.Volume;
+
+import net.milkbowl.vault.economy.Economy;
 
 /**
  * Main class of War
@@ -59,6 +91,7 @@ public class War extends JavaPlugin {
 	private final List<String> deadlyAdjectives = new ArrayList<String>();
 	private final List<String> killerVerbs = new ArrayList<String>();
 	private final InventoryBag defaultInventories = new InventoryBag();
+	private final WeaponBag weaponManager = new WeaponBag();
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
@@ -68,12 +101,14 @@ public class War extends JavaPlugin {
 	private WarBlockListener blockListener = new WarBlockListener();
 	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private PluginDescriptionFile desc = null;
+	private boolean TABenabled = false;
 	private boolean loaded = false;
 	// Zones and hub
 	private List<Warzone> warzones = new ArrayList<Warzone>();
 	private WarHub warHub;
 	private HashMap<String, PlayerState> disconnected = new HashMap<String, PlayerState>();
 	private KillstreakReward killstreakReward;
+	private List<Weapon> weapons = new ArrayList<Weapon>();
 	private MySQLConfig mysqlConfig;
 	private Economy econ = null;
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
@@ -116,7 +151,11 @@ public class War extends JavaPlugin {
 	 */
 	public void loadWar() {
 		this.setLoaded(true);
+		this.setTAB(this.getServer().getPluginManager().isPluginEnabled("TAB"));
 		this.desc = this.getDescription();
+		if(!this.getTAB()) {
+			Bukkit.getConsoleSender().sendMessage("TAB plugin has not been found - Names will not be hidden");
+		}
 
 		try {
 			Class.forName("org.sqlite.JDBC").newInstance();
@@ -241,6 +280,9 @@ public class War extends JavaPlugin {
 
 		// Load files
 		WarYmlMapper.load();
+		
+		WeaponYmlMapper.load();
+		this.setWeapons(this.getWeaponManager().getWeapons());
 
 		// Start tasks
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
@@ -1186,6 +1228,10 @@ public class War extends JavaPlugin {
 	public void setLoaded(boolean loaded) {
 		this.loaded = loaded;
 	}
+	
+	public void setTAB(boolean loaded) {
+		this.TABenabled = loaded;
+	}
 
 	public HashMap<String, PlayerState> getDisconnected() {
 		return this.disconnected;
@@ -1195,8 +1241,20 @@ public class War extends JavaPlugin {
 		this.disconnected = disconnected;
 	}
 
+	public boolean getTAB() {
+		return TABenabled;
+	}
+	
 	public InventoryBag getDefaultInventories() {
 		return defaultInventories;
+	}
+	
+	public WeaponBag getWeaponManager() {
+		return weaponManager;
+	}
+	
+	public List<Weapon> getWeapons() {
+		return weapons;
 	}
 
 	public List<String> getDeadlyAdjectives() {
@@ -1233,6 +1291,10 @@ public class War extends JavaPlugin {
 
 	public void setKillstreakReward(KillstreakReward killstreakReward) {
 		this.killstreakReward = killstreakReward;
+	}
+	
+	public void setWeapons(List<Weapon> wpns) {
+		this.weapons = wpns;
 	}
 
 	public MySQLConfig getMysqlConfig() {

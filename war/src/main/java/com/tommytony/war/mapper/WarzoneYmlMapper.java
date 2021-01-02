@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.logging.Level;
 
 public class WarzoneYmlMapper {
-
 	public static Warzone load(String name) { // removed createNewVolume, as it did nothing
 		File warzoneTxtFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		File warzoneYmlFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");

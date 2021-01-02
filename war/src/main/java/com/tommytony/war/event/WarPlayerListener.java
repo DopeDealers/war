@@ -41,8 +41,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.tommytony.war.Team;
@@ -61,6 +63,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.Weapon;
 import com.tommytony.war.volume.Volume;
 
 /**
@@ -90,6 +93,77 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onWeaponUse(final PlayerInteractEvent event) {
+		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
+			event.setCancelled(false);
+			return;
+		}
+		if(event.getHand() == EquipmentSlot.OFF_HAND || event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
+			return;
+		}
+		ItemStack item = event.getItem();
+		if(item == null) {
+			return;
+		}
+		Boolean isWeapon = false;
+		Weapon wpn = null;
+		for(Weapon wp : War.war.getWeapons()) {
+			if(item.getItemMeta().getDisplayName().toLowerCase().equals(wp.getName().toLowerCase())) {
+				isWeapon = true;
+				wpn = wp;
+				break;
+			} else if(item.getItemMeta().getDisplayName().toLowerCase().contains(wp.getName().toLowerCase())) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+		if(!isWeapon) {
+			return;
+		}
+		
+		Player player = event.getPlayer();
+		Location loc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.5));
+		Vector dir = loc.getDirection();
+		ItemStack newIt = item.clone();
+		int slot = player.getInventory().getHeldItemSlot();
+		
+		long rate = Math.round(wpn.getRate()); //rate has to be 2 for Item Replacement
+
+		loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),wpn.getSpread());
+		player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+		if(rate < 2 && wpn.getRapid()) {
+			final Weapon wepn = wpn;
+			Bukkit.getScheduler().runTaskLater(War.war, new Runnable() { //Rate under 2 requires extra shot
+				@Override
+				public void run() {
+					loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),wepn.getSpread());
+					player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+				}
+			}, 3);
+			rate = 2;
+		}
+		
+		if(wpn.getRapid()) { //If rapid it will be removed otherwise it will be changed
+			player.getInventory().remove(item);
+		} else {
+			ItemMeta newMeta = item.getItemMeta().clone();
+			newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
+			item.setItemMeta(newMeta);
+		}
+		
+		Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
+			@Override
+			public void run() {
+			    player.getInventory().setItem(slot, newIt);
+			}
+
+		}, rate);
+		
+		event.setCancelled(true);
+		return;
+	}
+	
 	@EventHandler
 	public void onPotionThrow(final PlayerInteractEvent event) {
 		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
@@ -117,7 +191,7 @@ public class WarPlayerListener implements Listener {
 		
 		final ThrownPotion pot = (ThrownPotion) loc.getWorld().spawnEntity(loc,EntityType.SPLASH_POTION);
 		pot.setItem(item);
-		
+			
 		final Vector vel = event.getPlayer().getEyeLocation().getDirection();
 		double yMul = 1.5;
 		if(vel.getY() > 1) {
@@ -298,6 +372,12 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
+			for(Weapon wp : War.war.getWeapons()) {
+				if(event.getItem().getItemMeta().getDisplayName().toLowerCase().equals(wp.getName().toLowerCase())) {
+					event.setCancelled(true);
+					return;
+				}
+			}
 			if (event.getItem() != null && event.getItem().getType() == Material.WOODEN_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);
