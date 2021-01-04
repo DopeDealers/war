@@ -213,6 +213,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.ALLOWENDER, true);
 		warzoneDefaultConfig.put(WarzoneConfig.RESETBLOCKS, false);
 		warzoneDefaultConfig.put(WarzoneConfig.ONLYRESETCHESTS, false);
+		warzoneDefaultConfig.put(WarzoneConfig.ENEMYNAMES, true);
 		warzoneDefaultConfig.put(WarzoneConfig.CAPTUREPOINTTIME, 15);
 		warzoneDefaultConfig.put(WarzoneConfig.CPRADIUS, 3);
 		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);

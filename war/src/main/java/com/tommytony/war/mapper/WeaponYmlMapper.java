@@ -39,7 +39,9 @@ public class WeaponYmlMapper {
 			float power = (float) config.getDouble(name + ".power");
 			float spread = (float) config.getDouble(name + ".spread");
 			boolean rapid = config.getBoolean(name + ".rapid");
-			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, rapid);
+			double damage = config.getDouble(name + ".damage");
+			int projectileCount = config.getInt(name + ".ProjectileCount");
+			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, rapid, damage, projectileCount);
 			wpns.add(wpn);
 			weapons.put(name, rate);
 		}
@@ -47,8 +49,8 @@ public class WeaponYmlMapper {
 		return wpns;
 	}
 	
-	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread , boolean rapid) {
-		return new Weapon(weaponName, rate, power, spread, rapid);
+	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread , boolean rapid, double damage, int projectileCount) {
+		return new Weapon(weaponName, rate, power, spread, rapid, damage, projectileCount);
 	}
 	
 	public static void save() {
@@ -57,7 +59,36 @@ public class WeaponYmlMapper {
 		(new File(War.war.getDataFolder().getPath())).mkdir();
 		
 		// defaultWeapons
+		List<String> wpnList = new ArrayList<String>();
+		wpnList.add("P90");
+		wpnList.add("AWP");
+		wpnList.add("Nova");
+		wpnRootSection.set("names", wpnList);
 		
+		ConfigurationSection p90ConfigSection = wpnRootSection.createSection("P90");
+		ConfigurationSection awpConfigSection = wpnRootSection.createSection("AWP");
+		ConfigurationSection novaConfigSection = wpnRootSection.createSection("Nova");
+		
+		p90ConfigSection.set("rate", 1);
+		p90ConfigSection.set("power", 10);
+		p90ConfigSection.set("spread", 2);
+		p90ConfigSection.set("damage", 3);
+		p90ConfigSection.set("ProjectileCount", 1);
+		p90ConfigSection.set("rapid", true);
+		
+		awpConfigSection.set("rate", 20);
+		awpConfigSection.set("power", 20);
+		awpConfigSection.set("spread", 0.2);
+		awpConfigSection.set("damage", 20);
+		awpConfigSection.set("ProjectileCount", 1);
+		awpConfigSection.set("rapid", false);
+		
+		novaConfigSection.set("rate", 5);
+		novaConfigSection.set("power", 7);
+		novaConfigSection.set("spread", 4);
+		novaConfigSection.set("damage", 7);
+		novaConfigSection.set("ProjectileCount", 7);
+		novaConfigSection.set("rapid", false);
 		
 		// Save to disk
 		File wpnConfigFile = new File(War.war.getDataFolder().getPath() + "/weapons.yml");

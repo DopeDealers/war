@@ -16,6 +16,8 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -25,6 +27,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -47,6 +51,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import com.sk89q.worldedit.util.eventbus.EventHandler.Priority;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -63,6 +68,8 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.MetadataValue;
+import com.tommytony.war.utility.PlayerRequests;
 import com.tommytony.war.utility.Weapon;
 import com.tommytony.war.volume.Volume;
 
@@ -93,19 +100,30 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onWeaponUse(final PlayerInteractEvent event) {
 		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
-			event.setCancelled(false);
+			//event.setCancelled(false);
 			return;
 		}
-		if(event.getHand() == EquipmentSlot.OFF_HAND || event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
+		if(event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
+			//event.setCancelled(false);
 			return;
 		}
-		ItemStack item = event.getItem();
-		if(item == null) {
+		
+		ItemStack item = null;
+		boolean offHand = false;
+		if(event.getHand() == EquipmentSlot.OFF_HAND) {
+			item = event.getPlayer().getInventory().getItemInOffHand();
+			offHand = true;
+		} else {
+			item = event.getPlayer().getInventory().getItemInMainHand();
+		}
+		
+		if(item == null || item.getItemMeta() == null) { //SOMEHOW this makes a difference...
 			return;
 		}
+		
 		Boolean isWeapon = false;
 		Weapon wpn = null;
 		for(Weapon wp : War.war.getWeapons()) {
@@ -126,26 +144,85 @@ public class WarPlayerListener implements Listener {
 		Location loc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.5));
 		Vector dir = loc.getDirection();
 		ItemStack newIt = item.clone();
-		int slot = player.getInventory().getHeldItemSlot();
+		
+		int slot;
+		if(!offHand) {
+			slot = player.getInventory().getHeldItemSlot();
+		} else {
+			slot = 40;
+		}
 		
 		long rate = Math.round(wpn.getRate()); //rate has to be 2 for Item Replacement
-
-		loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),wpn.getSpread());
-		player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+		
+		if(PlayerRequests.hasArrow(player)) {
+			List<Arrow> firstShot = new ArrayList<Arrow>();
+			for(int i = 0;i < wpn.getProjectileCount(); i++) {
+				Arrow arr = loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),wpn.getSpread());
+				firstShot.add(arr);
+			}
+			player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			PlayerRequests.removeArrow(player);
+			for(Arrow arr : firstShot) {
+				arr.setMetadata("Weapon", new MetadataValue(wpn.getName(), War.war));
+				arr.setBounce(false);
+				arr.setShooter(player);
+				arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+			}
+		}  else {
+			event.setCancelled(true);
+			return;
+		}
+		
 		if(rate < 2 && wpn.getRapid()) {
 			final Weapon wepn = wpn;
 			Bukkit.getScheduler().runTaskLater(War.war, new Runnable() { //Rate under 2 requires extra shot
 				@Override
 				public void run() {
-					loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),wepn.getSpread());
-					player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+					if(PlayerRequests.hasArrow(player)) {
+						List<Arrow> secondShot = new ArrayList<Arrow>();
+						for(int i = 0;i < wepn.getProjectileCount(); i++) {
+							Arrow arr = loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),wepn.getSpread());
+							secondShot.add(arr);
+						}
+						player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+						PlayerRequests.removeArrow(player);
+						for(Arrow arr : secondShot) {
+							arr.setMetadata("Weapon", new MetadataValue(wepn.getName(), War.war));
+							arr.setBounce(false);
+							arr.setShooter(player);
+							arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+						}
+					}
 				}
 			}, 3);
 			rate = 2;
 		}
 		
-		if(wpn.getRapid()) { //If rapid it will be removed otherwise it will be changed
-			player.getInventory().remove(item);
+		if(wpn.getRapid()) { 
+			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will be changed and later removed
+				ItemMeta newMeta = item.getItemMeta().clone();
+				newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
+				item.setItemMeta(newMeta);
+				final ItemStack remItem = item.clone();
+				final boolean offH = offHand;
+				Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
+					@Override
+					public void run() {
+						if(offH) {	//Offhand... Why you do this?
+							player.getInventory().setItemInOffHand(null);
+						} else {
+							player.getInventory().remove(remItem);
+						}
+					}
+
+				}, rate-1);
+			} else {
+				if(offHand) {	//Offhand... Why you do this?
+					player.getInventory().setItemInOffHand(null);
+				} else {
+					player.getInventory().remove(item);					
+				}
+			}
 		} else {
 			ItemMeta newMeta = item.getItemMeta().clone();
 			newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
@@ -163,6 +240,20 @@ public class WarPlayerListener implements Listener {
 		event.setCancelled(true);
 		return;
 	}
+	
+	
+	@EventHandler
+	public void onCustomArrow(final EntityDamageByEntityEvent event) {
+		if(event.getCause() != DamageCause.PROJECTILE && !event.getDamager().hasMetadata("Weapon")) {
+			return;
+		}
+		
+		String wpnName = event.getDamager().getMetadata("Weapon").get(0).value().toString();
+		Weapon wpn = Weapon.getWeaponByString(wpnName);
+		
+		event.setDamage(wpn.getDamage());
+	}
+	
 	
 	@EventHandler
 	public void onPotionThrow(final PlayerInteractEvent event) {
@@ -372,12 +463,13 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			for(Weapon wp : War.war.getWeapons()) {
-				if(event.getItem().getItemMeta().getDisplayName().toLowerCase().equals(wp.getName().toLowerCase())) {
+			if(event.getItem() != null && Weapon.getWeaponByString(event.getItem().getItemMeta().getDisplayName()) != null) {
+				if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
 					event.setCancelled(true);
-					return;
 				}
+				return;
 			}
+			
 			if (event.getItem() != null && event.getItem().getType() == Material.WOODEN_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);

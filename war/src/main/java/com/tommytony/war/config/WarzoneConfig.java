@@ -28,6 +28,7 @@ public enum WarzoneConfig {
 	ALLOWENDER (Boolean.class, "Allow Ender Chests", "If true, ender chests are allowed\nEnder chests are usually blocked to prevent item duplication"),
 	RESETBLOCKS (Boolean.class, "Reset Blocks", "If true, reset warzone blocks each battle"),
 	ONLYRESETCHESTS (Boolean.class, "Reset Blocks", "If true, only chests will be reset"),
+	ENEMYNAMES (Boolean.class, "Seeing Enemy Names", "If true, players can see enemy names"),
 	CPRADIUS (Integer.class, "CapturePoint-Radius", "Defines the Capture-Point-Radius"),
 	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point"),
 	PREPTIME(Integer.class, "Preparation Time", "Time, in seconds, before players are allowed to fight");

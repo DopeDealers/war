@@ -1121,7 +1121,7 @@ public class Warzone {
 		this.getReallyDeadFighters().remove(player.getName());
 		this.keepPlayerState(player); //MARK - Absturz-Inventar?
 
-		if(War.war.getTAB()) {
+		if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
 			TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
 
 			for(Team t : this.teams) {
@@ -1395,7 +1395,7 @@ public class Warzone {
 	private void handlePlayerLeave(Player player) {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam != null) {
-			if(War.war.getTAB()) {
+			if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
 				TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
 				for(Team t : this.teams) {
 					if(t != playerTeam) {
