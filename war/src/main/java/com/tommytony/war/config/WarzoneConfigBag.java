@@ -3,6 +3,8 @@ package com.tommytony.war.config;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -79,6 +81,7 @@ public class WarzoneConfigBag {
 			return (String)bag.get(config);
 		} else {
 			// use War default config
+			Bukkit.getConsoleSender().sendMessage("Eh");
 			return War.war.getWarzoneDefaultConfig().getString(config);
 		}
 	}
@@ -116,6 +119,8 @@ public class WarzoneConfigBag {
 					this.put(config, warzoneConfigSection.getInt(config.toString()));
 				} else if (config.getConfigType().equals(Boolean.class)) {
 					this.put(config, warzoneConfigSection.getBoolean(config.toString()));
+				} else if (config.getConfigType().equals(String.class)) {
+					this.put(config, warzoneConfigSection.getString(config.toString()));
 				} else if (config.getConfigType().equals(ScoreboardType.class)) {
 					this.put(config, ScoreboardType.getFromString(warzoneConfigSection.getString(config.toString())));
 				}
