@@ -1134,6 +1134,8 @@ public class Warzone {
 				}
 			}
 		}
+		
+		player.setMaximumNoDamageTicks(0);
 
 		War.war.msg(player, "join.inventorystored");
 		this.respawnPlayer(team, player);
@@ -1408,6 +1410,7 @@ public class Warzone {
 				}
 			}
 
+			player.setMaximumNoDamageTicks(20);
 			playerTeam.removePlayer(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();

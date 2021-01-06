@@ -1,16 +1,16 @@
 package com.tommytony.war.config;
 
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.mapper.WarzoneYmlMapper;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.logging.Level;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.mapper.WarzoneYmlMapper;
 
 
 public class WarzoneConfigBag {
