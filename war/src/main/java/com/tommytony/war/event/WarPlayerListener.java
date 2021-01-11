@@ -51,7 +51,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
-import com.sk89q.worldedit.util.eventbus.EventHandler.Priority;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -131,7 +130,7 @@ public class WarPlayerListener implements Listener {
 				isWeapon = true;
 				wpn = wp;
 				break;
-			} else if(item.getItemMeta().getDisplayName().toLowerCase().contains(wp.getName().toLowerCase())) {
+			} else if(item.getItemMeta().getDisplayName().toLowerCase().equals("."+wp.getName().toLowerCase()+".")) {
 				event.setCancelled(true);
 				return;
 			}
@@ -141,7 +140,7 @@ public class WarPlayerListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		Location loc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.5));
+		Location loc = player.getEyeLocation();
 		Vector dir = loc.getDirection();
 		ItemStack newIt = item.clone();
 
@@ -163,7 +162,7 @@ public class WarPlayerListener implements Listener {
 			player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 			PlayerRequests.removeArrow(player);
 			for(Arrow arr : firstShot) {
-				arr.setMetadata("Weapon", new MetadataValue(wpn.getName(), War.war));
+				arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wpn.getName(), War.war));
 				arr.setBounce(false);
 				arr.setShooter(player);
 				arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
@@ -187,7 +186,7 @@ public class WarPlayerListener implements Listener {
 						player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
 						PlayerRequests.removeArrow(player);
 						for(Arrow arr : secondShot) {
-							arr.setMetadata("Weapon", new MetadataValue(wepn.getName(), War.war));
+							arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wepn.getName(), War.war));
 							arr.setBounce(false);
 							arr.setShooter(player);
 							arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
@@ -244,11 +243,11 @@ public class WarPlayerListener implements Listener {
 
 	@EventHandler
 	public void onCustomArrow(final EntityDamageByEntityEvent event) {
-		if(event.getCause() != DamageCause.PROJECTILE || !event.getDamager().hasMetadata("Weapon")) {
+		if(event.getCause() != DamageCause.PROJECTILE || !event.getDamager().hasMetadata("WarPluginCustomWeapon")) {
 			return;
 		}
 		
-		String wpnName = event.getDamager().getMetadata("Weapon").get(0).value().toString();
+		String wpnName = event.getDamager().getMetadata("WarPluginCustomWeapon").get(0).value().toString();
 		Weapon wpn = Weapon.getWeaponByString(wpnName);
 
 		event.setDamage(wpn.getDamage());
