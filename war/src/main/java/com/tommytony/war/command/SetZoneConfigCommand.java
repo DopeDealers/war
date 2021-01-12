@@ -1,16 +1,11 @@
 package com.tommytony.war.command;
 
-import java.util.logging.Level;
-
-import com.tommytony.war.config.WarzoneConfigBag;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.structure.ZoneLobby;
 
 public class SetZoneConfigCommand extends AbstractOptionalZoneMakerCommand {

@@ -197,7 +197,7 @@ public class WarPlayerListener implements Listener {
 			rate = 2;
 		}
 
-		if(wpn.getRapid()) {
+		if(wpn.getRapid() && Warzone.getZoneByLocation(event.getPlayer()) != null) {
 			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will be changed and later removed
 				ItemMeta newMeta = item.getItemMeta().clone();
 				newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
@@ -207,10 +207,12 @@ public class WarPlayerListener implements Listener {
 				Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
 					@Override
 					public void run() {
-						if(offH) {	//Offhand... Why you do this?
-							player.getInventory().setItemInOffHand(null);
-						} else {
-							player.getInventory().remove(remItem);
+						if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
+							if(offH) {	//Offhand... Why you do this?
+								player.getInventory().setItemInOffHand(null);
+							} else {
+								player.getInventory().remove(remItem);
+							}
 						}
 					}
 
@@ -222,7 +224,7 @@ public class WarPlayerListener implements Listener {
 					player.getInventory().remove(item);
 				}
 			}
-		} else {
+		} else if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
 			ItemMeta newMeta = item.getItemMeta().clone();
 			newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
 			item.setItemMeta(newMeta);
@@ -231,7 +233,9 @@ public class WarPlayerListener implements Listener {
 		Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
 			@Override
 			public void run() {
-			    player.getInventory().setItem(slot, newIt);
+				if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
+				    player.getInventory().setItem(slot, newIt);
+				}
 			}
 
 		}, rate);

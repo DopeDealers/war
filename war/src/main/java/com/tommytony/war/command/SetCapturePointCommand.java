@@ -1,15 +1,15 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.CapturePoint;
-import com.tommytony.war.structure.Monument;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.util.logging.Level;
 
 /**
  * Sets a capture point
@@ -67,6 +67,7 @@ public class SetCapturePointCommand extends AbstractZoneMakerCommand {
 			}
 			CapturePoint cp = new CapturePoint(this.args[0], player.getLocation(), controller, strength, zone);
 			zone.getCapturePoints().add(cp);
+			this.msg("Capture point " + cp.getName() + " was created.");
 			War.war.log(this.getSender().getName() + " created capture point " + cp.getName() + " in warzone " + zone.getName(), Level.INFO);
 		}
 

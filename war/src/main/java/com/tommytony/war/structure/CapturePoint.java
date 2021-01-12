@@ -3,6 +3,7 @@ package com.tommytony.war.structure;
 import java.util.Collection;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -24,12 +25,6 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class CapturePoint {
 	private static int[][][] structure = {
-			{
-				{0}
-			},
-			{
-				{0}
-			}
 	};
 
 	private final String name;
@@ -51,15 +46,15 @@ public class CapturePoint {
 	}
 
 	private Location getOrigin() {
-		return location.clone().subtract(0, 0, 0).getBlock().getLocation();
+		return location.clone().getBlock().getLocation();
 	}
 
 	private void updateBlocks() {
 		Validate.notNull(location);
-		// Set origin to back left corner
+		// Set origin to middle
 		Location origin = this.getOrigin();
-		// Build structure
-		for (int y = 0; y < structure.length; y++) {
+		// Build structure - not necessary rn
+		/*for (int y = 0; y < structure.length; y++) {
 			for (int z = 0; z < structure[0].length; z++) {
 				for (int x = 0; x < structure[0][0].length; x++) {
 					BlockState state = origin.clone().add(x, y, z).getBlock().getState();
@@ -73,19 +68,19 @@ public class CapturePoint {
 					state.update(true);
 				}
 			}
-		}
+		} */
 		
 		ArmorStand stand = null;
 		
-		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 0.5, 0.5, 0.5);
+		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 1, 3, 1);
 		for(Entity en : entities) {
 			if(en.getType().name().toUpperCase().equals("ARMOR_STAND")) {
 				stand = (ArmorStand) en;
 			}
 		}
-		
+				
 		if(stand == null) {
-			stand = (ArmorStand) origin.getWorld().spawnEntity(origin, EntityType.ARMOR_STAND);
+			stand = (ArmorStand) origin.getWorld().spawnEntity(origin.clone().add(0.5, 2, 0.5), EntityType.ARMOR_STAND);
 			stand.setPersistent(true);
 			stand.setGravity(false);
 			stand.setInvulnerable(true);
@@ -124,7 +119,7 @@ public class CapturePoint {
 	
 	public void removeArmorstand() {
 		Location origin = this.getOrigin();
-		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 0.5, 0.5, 0.5);
+		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 1, 3, 1);
 		for(Entity en : entities) {
 			if(en.getType().name().toUpperCase().equals("ARMOR_STAND")) {
 				en.remove();
