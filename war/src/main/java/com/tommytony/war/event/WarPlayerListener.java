@@ -38,11 +38,13 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -102,11 +104,6 @@ public class WarPlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onWeaponUse(final PlayerInteractEvent event) {
 		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
-			//event.setCancelled(false);
-			return;
-		}
-		if(event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
-			//event.setCancelled(false);
 			return;
 		}
 
@@ -138,8 +135,24 @@ public class WarPlayerListener implements Listener {
 		if(!isWeapon) {
 			return;
 		}
+		
 
 		Player player = event.getPlayer();
+
+		if(event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
+			//Scopez
+			if(wpn.getScope()) {
+				if(player.getWalkSpeed() < 0) {
+					player.setWalkSpeed(0.2f);
+					event.setCancelled(true);
+				} else {
+					player.setWalkSpeed(-1f);
+					event.setCancelled(true);
+				}
+			}
+			return;
+		}
+
 		Location loc = player.getEyeLocation();
 		Vector dir = loc.getDirection();
 		ItemStack newIt = item.clone();
@@ -159,12 +172,13 @@ public class WarPlayerListener implements Listener {
 				Arrow arr = loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),wpn.getSpread());
 				firstShot.add(arr);
 			}
-			player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			player.getWorld().playSound(loc,wpn.getSound(), 1, 2);
 			PlayerRequests.removeArrow(player);
 			for(Arrow arr : firstShot) {
 				arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wpn.getName(), War.war));
 				arr.setBounce(false);
 				arr.setShooter(player);
+				arr.setPierceLevel(wpn.getPierce());
 				arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			}
 		}  else {
@@ -183,12 +197,13 @@ public class WarPlayerListener implements Listener {
 							Arrow arr = loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),wepn.getSpread());
 							secondShot.add(arr);
 						}
-						player.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+						player.getWorld().playSound(loc, wepn.getSound(), 1, 2);
 						PlayerRequests.removeArrow(player);
 						for(Arrow arr : secondShot) {
 							arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wepn.getName(), War.war));
 							arr.setBounce(false);
 							arr.setShooter(player);
+							arr.setPierceLevel(wepn.getPierce());
 							arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 						}
 					}
@@ -256,6 +271,44 @@ public class WarPlayerListener implements Listener {
 
 		event.setDamage(wpn.getDamage());
 	}
+	
+	@EventHandler
+	public void onSwitchFromWeapon(final PlayerItemHeldEvent event) {
+		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
+			return;
+		}
+		Player player = event.getPlayer();
+		ItemStack item = player.getInventory().getItem(event.getPreviousSlot());
+		if(item == null || item.getItemMeta() == null) {
+			return;
+		}
+		for(Weapon wp : War.war.getWeapons()) {
+			if(item.getItemMeta().getDisplayName().toLowerCase().equals(wp.getName().toLowerCase())) {
+				if(player.getWalkSpeed() < 0) {
+					player.setWalkSpeed(0.2f);
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onSwitchHandFromWeapon(final PlayerSwapHandItemsEvent event) {
+		if(Warzone.getZoneByLocation(event.getPlayer()) == null) {
+			return;
+		}
+		Player player = event.getPlayer();
+		ItemStack item = event.getOffHandItem();
+		if(item == null || item.getItemMeta() == null) {
+			return;
+		}
+		for(Weapon wp : War.war.getWeapons()) {
+			if(item.getItemMeta().getDisplayName().toLowerCase().equals(wp.getName().toLowerCase())) {
+				if(player.getWalkSpeed() < 0) {
+					player.setWalkSpeed(0.2f);
+				}
+			}
+		}
+	}
 
 
 	@EventHandler
@@ -291,6 +344,7 @@ public class WarPlayerListener implements Listener {
 		if(vel.getY() > 1) {
 			yMul = 2.5;
 		}
+		vel.add(event.getPlayer().getVelocity());
 		vel.multiply(new Vector(1.5,yMul,1.5));
 		pot.setVelocity(vel);
 

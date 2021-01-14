@@ -39,9 +39,12 @@ public class WeaponYmlMapper {
 			float power = (float) config.getDouble(name + ".power");
 			float spread = (float) config.getDouble(name + ".spread");
 			boolean rapid = config.getBoolean(name + ".rapid");
+			boolean scope = config.getBoolean(name + ".scope");
 			double damage = config.getDouble(name + ".damage");
 			int projectileCount = config.getInt(name + ".ProjectileCount");
-			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, rapid, damage, projectileCount);
+			int pierce = config.getInt(name + ".PierceLevel");
+			String sound = config.getString(name + ".sound");
+			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, rapid, scope, damage, projectileCount, pierce, sound);
 			wpns.add(wpn);
 			weapons.put(name, rate);
 		}
@@ -49,8 +52,8 @@ public class WeaponYmlMapper {
 		return wpns;
 	}
 	
-	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread , boolean rapid, double damage, int projectileCount) {
-		return new Weapon(weaponName, rate, power, spread, rapid, damage, projectileCount);
+	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread , boolean rapid, boolean scope, double damage, int projectileCount, int pierce, String sound) {
+		return new Weapon(weaponName, rate, power, spread, rapid, scope, damage, projectileCount, pierce, sound);
 	}
 	
 	public static void save() {
@@ -73,22 +76,31 @@ public class WeaponYmlMapper {
 		p90ConfigSection.set("power", 10);
 		p90ConfigSection.set("spread", 2);
 		p90ConfigSection.set("damage", 3);
+		p90ConfigSection.set("PierceLevel", 0);
 		p90ConfigSection.set("ProjectileCount", 1);
 		p90ConfigSection.set("rapid", true);
+		p90ConfigSection.set("scope", false);
+		p90ConfigSection.set("sound", "ENTITY_BLAZE_SHOOT");
 		
 		awpConfigSection.set("rate", 20);
 		awpConfigSection.set("power", 20);
 		awpConfigSection.set("spread", 0.2);
 		awpConfigSection.set("damage", 20);
+		awpConfigSection.set("PierceLevel", 1);
 		awpConfigSection.set("ProjectileCount", 1);
 		awpConfigSection.set("rapid", false);
+		awpConfigSection.set("scope", true);
+		awpConfigSection.set("sound", "ENTITY_BLAZE_SHOOT");
 		
 		novaConfigSection.set("rate", 5);
 		novaConfigSection.set("power", 7);
-		novaConfigSection.set("spread", 4);
+		novaConfigSection.set("spread", 6);
 		novaConfigSection.set("damage", 7);
+		novaConfigSection.set("PierceLevel", 0);
 		novaConfigSection.set("ProjectileCount", 7);
 		novaConfigSection.set("rapid", false);
+		novaConfigSection.set("scope", false);
+		novaConfigSection.set("sound", "ENTITY_BLAZE_SHOOT");
 		
 		// Save to disk
 		File wpnConfigFile = new File(War.war.getDataFolder().getPath() + "/weapons.yml");

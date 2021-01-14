@@ -1396,6 +1396,10 @@ public class Warzone {
 
 	private void handlePlayerLeave(Player player) {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
+		if(player.getWalkSpeed() < 0) {
+			player.setWalkSpeed(0.2f);
+		}
+		
 		if (playerTeam != null) {
 			if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
 				TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
