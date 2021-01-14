@@ -509,6 +509,9 @@ public class Warzone {
 		for (AttributeModifier mod : ai.getModifiers()) {
 			ai.removeModifier(mod);
 		}
+		if(player.getWalkSpeed() < 0) {
+			player.setWalkSpeed(0.2f);
+		}
 		ai.setBaseValue(20.0);
 		player.setHealth(ai.getValue());
 		player.setFoodLevel(20);

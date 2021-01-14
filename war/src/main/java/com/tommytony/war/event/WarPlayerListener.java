@@ -211,6 +211,9 @@ public class WarPlayerListener implements Listener {
 			}, 3);
 			rate = 2;
 		}
+		if(player.getWalkSpeed() < 0) {
+			player.setWalkSpeed(0.2f);
+		}
 
 		if(wpn.getRapid() && Warzone.getZoneByLocation(event.getPlayer()) != null) {
 			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will be changed and later removed
@@ -1140,6 +1143,9 @@ public class WarPlayerListener implements Listener {
 		Warzone deadZone = Warzone.getZoneForDeadPlayer(event.getPlayer());
 		if (playingZone == null && deadZone != null) {
 			// Game ended while player was dead, so restore state
+			if(event.getPlayer().getWalkSpeed() < 0) {
+				event.getPlayer().setWalkSpeed(0.2f);
+			}
 			deadZone.getReallyDeadFighters().remove(event.getPlayer().getName());
 			if (deadZone.hasPlayerState(event.getPlayer().getName())) {
 				deadZone.restorePlayerState(event.getPlayer());
