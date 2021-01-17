@@ -19,8 +19,10 @@ public class WeaponBag {
 		return this.weapons;
 	}
 	
-	public void addWeapon(String name, Double rate, float power, float spread, boolean rapid, boolean scope, double damage, int projectileCount, int pierce, String sound) {
-		this.weapons.add(new Weapon(name, rate, power, spread, rapid, scope, damage, projectileCount, pierce, sound));
+	public void addWeapon(String name, Double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread,
+			boolean rapid, int knockback, boolean scope, double damage, int projectileCount, int pierce, String sound) {
+		this.weapons.add(new Weapon(name, rate, power, spread, sneSpread, sprSpread, jmpSpread,
+				rapid, knockback, scope, damage, projectileCount, pierce, sound));
 	}
 
 	public void addWeapon(Weapon weapon) {

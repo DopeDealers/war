@@ -157,19 +157,13 @@ public class WarPlayerListener implements Listener {
 		Vector dir = loc.getDirection();
 		ItemStack newIt = item.clone();
 
-		int slot;
-		if(!offHand) {
-			slot = player.getInventory().getHeldItemSlot();
-		} else {
-			slot = 40;
-		}
-
 		long rate = Math.round(wpn.getRate()); //rate has to be 2 for Item Replacement
 
 		if(PlayerRequests.hasArrow(player)) {
 			List<Arrow> firstShot = new ArrayList<Arrow>();
+			float spread = wpn.getSpread(player);
 			for(int i = 0;i < wpn.getProjectileCount(); i++) {
-				Arrow arr = loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),wpn.getSpread());
+				Arrow arr = loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),spread);
 				firstShot.add(arr);
 			}
 			player.getWorld().playSound(loc,wpn.getSound(), 1, 2);
@@ -178,14 +172,16 @@ public class WarPlayerListener implements Listener {
 				arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wpn.getName(), War.war));
 				arr.setBounce(false);
 				arr.setShooter(player);
+				arr.setKnockbackStrength(wpn.getKnockback());
 				arr.setPierceLevel(wpn.getPierce());
+				arr.setTicksLived(900);
 				arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 			}
 		}  else {
 			event.setCancelled(true);
 			return;
 		}
-
+		
 		if(rate < 2 && wpn.getRapid()) {
 			final Weapon wepn = wpn;
 			Bukkit.getScheduler().runTaskLater(War.war, new Runnable() { //Rate under 2 requires extra shot
@@ -193,8 +189,9 @@ public class WarPlayerListener implements Listener {
 				public void run() {
 					if(PlayerRequests.hasArrow(player)) {
 						List<Arrow> secondShot = new ArrayList<Arrow>();
+						float spread = wepn.getSpread(player);
 						for(int i = 0;i < wepn.getProjectileCount(); i++) {
-							Arrow arr = loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),wepn.getSpread());
+							Arrow arr = loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),spread);
 							secondShot.add(arr);
 						}
 						player.getWorld().playSound(loc, wepn.getSound(), 1, 2);
@@ -203,7 +200,9 @@ public class WarPlayerListener implements Listener {
 							arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wepn.getName(), War.war));
 							arr.setBounce(false);
 							arr.setShooter(player);
+							arr.setKnockbackStrength(wepn.getKnockback());
 							arr.setPierceLevel(wepn.getPierce());
+							arr.setTicksLived(900);
 							arr.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 						}
 					}
@@ -214,7 +213,8 @@ public class WarPlayerListener implements Listener {
 		if(player.getWalkSpeed() < 0) {
 			player.setWalkSpeed(0.2f);
 		}
-
+		
+		int slot = -1;
 		if(wpn.getRapid() && Warzone.getZoneByLocation(event.getPlayer()) != null) {
 			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will be changed and later removed
 				ItemMeta newMeta = item.getItemMeta().clone();
@@ -222,6 +222,10 @@ public class WarPlayerListener implements Listener {
 				item.setItemMeta(newMeta);
 				final ItemStack remItem = item.clone();
 				final boolean offH = offHand;
+				slot = player.getInventory().first(item);
+				if(offHand) {
+					slot = 40;
+				}
 				Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
 					@Override
 					public void run() {
@@ -236,7 +240,9 @@ public class WarPlayerListener implements Listener {
 
 				}, rate-1);
 			} else {
+				slot = player.getInventory().first(item);
 				if(offHand) {	//Offhand... Why you do this?
+					slot = 40;
 					player.getInventory().setItemInOffHand(null);
 				} else {
 					player.getInventory().remove(item);
@@ -247,12 +253,31 @@ public class WarPlayerListener implements Listener {
 			newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
 			item.setItemMeta(newMeta);
 		}
-
+		
+		
+		ItemStack it = item;
+		int slt = slot;
+		Weapon wepn = wpn;
 		Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
 			@Override
 			public void run() {
 				if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
-				    player.getInventory().setItem(slot, newIt);
+					int sl = slt;
+					if(!wepn.getRapid()) {
+						sl = player.getInventory().first(it);
+					}
+					if(sl == -1 && player.getInventory().getItemInOffHand().equals(it)) { //Yay hand-switching
+						player.getInventory().setItemInOffHand(newIt);
+					} else if(sl != -1) {
+					    player.getInventory().setItem(sl, newIt);
+					}
+					if(wepn.getRapid() && wepn.getRate() > 2) {
+						if(player.getInventory().contains(it)) {
+							player.getInventory().remove(it);
+						} else if (player.getInventory().getItemInOffHand().equals(it)) {
+							player.getInventory().setItemInOffHand(null);
+						}
+					}
 				}
 			}
 
@@ -261,7 +286,6 @@ public class WarPlayerListener implements Listener {
 		event.setCancelled(true);
 		return;
 	}
-
 
 	@EventHandler
 	public void onCustomArrow(final EntityDamageByEntityEvent event) {
