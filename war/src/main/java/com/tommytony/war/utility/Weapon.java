@@ -18,6 +18,7 @@ public class Weapon implements Comparable<Weapon> {
 	private float sneSpread;
 	private float sprSpread;
 	private float jmpSpread;
+	private float scopeSpread;
 	
 	private boolean rapid;
 	private int knockback;
@@ -27,7 +28,7 @@ public class Weapon implements Comparable<Weapon> {
 	private int pierce;
 	private Sound sound;
 		
-	public Weapon(String name, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread,
+	public Weapon(String name, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread, float scopeSpread,
 			boolean rapid, int knockback,
 			boolean scope, double damage, int projectileCount, int pierce, String sound) {
 		this.name = name;
@@ -38,6 +39,7 @@ public class Weapon implements Comparable<Weapon> {
 		this.sneSpread = sneSpread;
 		this.sprSpread = sprSpread;	
 		this.jmpSpread = jmpSpread;
+		this.scopeSpread = scopeSpread;
 		
 		this.rapid = rapid;
 		this.knockback = knockback;
@@ -45,7 +47,15 @@ public class Weapon implements Comparable<Weapon> {
 		this.damage = damage;
 		this.projectileCount = projectileCount;
 		this.pierce = pierce;
-		this.sound = Sound.valueOf(sound);
+		if(sound != null && !sound.equals("")) {
+			try {
+				this.sound = Sound.valueOf(sound);
+			} catch(IllegalArgumentException e) {
+				this.sound = null;
+			}
+		} else {
+			this.sound = null;
+		}
 	}
 	
 	static {
@@ -81,14 +91,17 @@ public class Weapon implements Comparable<Weapon> {
 			inAir = true;
 		}
 		
-		if(player.isSprinting()) {
-			spr = sprSpread;
-		} else if(player.isSneaking()) {
+		if(player.isSneaking()) {
 			spr = sneSpread;
+		} else if(player.isSprinting()) {
+			spr = sprSpread;
 		}
 		
 		if(inAir) {
 			spr = spr + jmpSpread;
+		}
+		if (player.getWalkSpeed() < 0) {
+			spr = spr * (1 / scopeSpread);
 		}
 	
 		return spr;

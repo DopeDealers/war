@@ -1404,18 +1404,7 @@ public class Warzone {
 		}
 		
 		if (playerTeam != null) {
-			if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
-				TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
-				for(Team t : this.teams) {
-					if(t != playerTeam) {
-						for(Player p : t.getPlayers()) {
-							TabPlayer tp = TABAPI.getPlayer(p.getUniqueId());
-							tp.showNametag(player.getUniqueId());
-							tplayer.showNametag(p.getUniqueId());
-						}
-					}
-				}
-			}
+			this.showNametags(player, playerTeam);
 
 			player.setMaximumNoDamageTicks(20);
 			playerTeam.removePlayer(player);
@@ -1445,7 +1434,22 @@ public class Warzone {
 			War.war.getServer().getPluginManager().callEvent(event1);
 		}
 	}
-
+	
+	private void showNametags(Player player, Team playerTeam) {
+		if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
+			TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
+			for(Team t : this.teams) {
+				if(t != playerTeam) {
+					for(Player p : t.getPlayers()) {
+						TabPlayer tp = TABAPI.getPlayer(p.getUniqueId());
+						tp.showNametag(player.getUniqueId());
+						tplayer.showNametag(p.getUniqueId());
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Moves players from team to team if the player size delta is greater than or equal to 2.
 	 * Only works for autoassign zones.
@@ -1638,6 +1642,9 @@ public class Warzone {
 			boolean doEcoReward = ecoReward != 0 && War.war.getEconomy() != null;
 			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
 				Player tp = it.next();
+				
+				this.showNametags(tp, t);
+				
 				it.remove(); // Remove player from team first to prevent anti-tp
 				t.removePlayer(tp);
 				tp.teleport(this.getEndTeleport(LeaveCause.SCORECAP));

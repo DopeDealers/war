@@ -40,6 +40,7 @@ public class WeaponYmlMapper {
 			float spread = (float) config.getDouble(name + ".spread");
 			float sneSpread = (float) config.getDouble(name + ".sneakSpread");
 			float sprSpread = (float) config.getDouble(name + ".sprintSpread");
+			float scopeSpread = (float) config.getDouble(name + ".scopeSpread");
 			float jmpSpread = (float) config.getDouble(name + ".additionalJumpSpread");
 			int knockback = config.getInt(name + ".knockback");
 			boolean rapid = config.getBoolean(name + ".rapid");
@@ -48,7 +49,7 @@ public class WeaponYmlMapper {
 			int projectileCount = config.getInt(name + ".ProjectileCount");
 			int pierce = config.getInt(name + ".PierceLevel");
 			String sound = config.getString(name + ".sound");
-			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, sneSpread, sprSpread, jmpSpread,
+			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, sneSpread, sprSpread, jmpSpread, scopeSpread,
 					rapid, knockback, scope, damage, projectileCount, pierce, sound);
 			wpns.add(wpn);
 			weapons.put(name, rate);
@@ -57,9 +58,9 @@ public class WeaponYmlMapper {
 		return wpns;
 	}
 	
-	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread,
+	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread, float scopeSpread,
 			boolean rapid, int knockback, boolean scope, double damage, int projectileCount, int pierce, String sound) {
-		return new Weapon(weaponName, rate, power, spread, sneSpread, sprSpread, jmpSpread,
+		return new Weapon(weaponName, rate, power, spread, sneSpread, sprSpread, jmpSpread, scopeSpread,
 				rapid, knockback, scope, damage, projectileCount, pierce, sound);
 	}
 	
@@ -84,6 +85,7 @@ public class WeaponYmlMapper {
 		p90ConfigSection.set("spread", 2);
 		p90ConfigSection.set("sneakSpread", 1.5);
 		p90ConfigSection.set("sprintSpread", 4);
+		p90ConfigSection.set("scopeSpread", 1);
 		p90ConfigSection.set("additionalJumpSpread", 2.5);
 		p90ConfigSection.set("damage", 3);
 		p90ConfigSection.set("knockback", 0);
@@ -95,13 +97,13 @@ public class WeaponYmlMapper {
 		
 		awpConfigSection.set("rate", 20);
 		awpConfigSection.set("power", 20);
-		awpConfigSection.set("spread", 0.2);
-		awpConfigSection.set("sneakSpread", 0.1);
+		awpConfigSection.set("spread", 1);
+		awpConfigSection.set("sneakSpread", 0.3);
 		awpConfigSection.set("sprintSpread", 2);
+		awpConfigSection.set("scopeSpread", 3);
 		awpConfigSection.set("additionalJumpSpread", 5);
-		awpConfigSection.set("damage", 3);
-		awpConfigSection.set("knockback", 0);
 		awpConfigSection.set("damage", 20);
+		awpConfigSection.set("knockback", 0);
 		awpConfigSection.set("PierceLevel", 1);
 		awpConfigSection.set("ProjectileCount", 1);
 		awpConfigSection.set("rapid", false);
@@ -113,10 +115,10 @@ public class WeaponYmlMapper {
 		novaConfigSection.set("spread", 6);
 		novaConfigSection.set("sneakSpread", 5);
 		novaConfigSection.set("sprintSpread", 10);
+		novaConfigSection.set("scopeSpread", 1);
 		novaConfigSection.set("additionalJumpSpread", 3);
-		novaConfigSection.set("damage", 3);
-		novaConfigSection.set("knockback", 0);
 		novaConfigSection.set("damage", 7);
+		novaConfigSection.set("knockback", 0);
 		novaConfigSection.set("PierceLevel", 0);
 		novaConfigSection.set("ProjectileCount", 7);
 		novaConfigSection.set("rapid", false);

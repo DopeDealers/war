@@ -1,13 +1,20 @@
 package com.tommytony.war;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -20,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -82,6 +90,7 @@ import net.milkbowl.vault.economy.Economy;
 public class War extends JavaPlugin {
 	static final boolean HIDE_BLANK_MESSAGES = true;
 	public static War war;
+	YamlConfiguration lang = new YamlConfiguration();
 	private static ResourceBundle messages = ResourceBundle.getBundle("messages");
 	private final List<OfflinePlayer> zoneMakerNames = new ArrayList<>();
 	private final List<String> commandWhitelist = new ArrayList<String>();
@@ -121,13 +130,32 @@ public class War extends JavaPlugin {
 		War.war = this;
 	}
 
-	public static void reloadLanguage() {
+	public static void reloadLanguage() throws IOException {
 		String[] parts = War.war.getWarConfig().getString(WarConfig.LANGUAGE).replace("-", "_").split("_");
 		Locale lang = new Locale(parts[0]);
 		if (parts.length >= 2) {
 			lang = new Locale(parts[0], parts[1]);
 		}
-		War.messages = ResourceBundle.getBundle("messages", lang);
+		File langFile = new File(war.getDataFolder().getAbsolutePath()
+				+ File.separator + "messages_"+lang+".properties");
+		
+		if (!langFile.exists() || langFile.length() < 1) {
+			ClassLoader classLoader = war.getClass().getClassLoader();
+			InputStream input = classLoader.getResourceAsStream("messages_"+lang+".properties");
+			byte[] buffer = new byte[input.available()];
+			input.read(buffer);
+			
+			OutputStream output = new FileOutputStream(langFile);
+			output.write(buffer);
+			// newC.save(configFile);
+		}
+		
+		FileInputStream fis = new FileInputStream(langFile.getAbsolutePath());
+        try {
+            War.messages = new PropertyResourceBundle(fis);
+        } finally {
+            fis.close();
+        };
 	}
 
 	/**
@@ -310,7 +338,12 @@ public class War extends JavaPlugin {
 			}
 		}
 
-		War.reloadLanguage();
+		try {
+			War.reloadLanguage();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// Get own log file
 		try {

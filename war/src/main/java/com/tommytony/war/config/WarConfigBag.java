@@ -1,5 +1,7 @@
 package com.tommytony.war.config;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -88,7 +90,12 @@ public class WarConfigBag {
 					this.bag.put(warConfig, str);
 				}
 				if (warConfig == WarConfig.LANGUAGE) {
-					War.reloadLanguage();
+					try {
+						War.reloadLanguage();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 				returnMessage += warConfig.toString() + " set to " + namedParams.get(namedParam); 
 			}

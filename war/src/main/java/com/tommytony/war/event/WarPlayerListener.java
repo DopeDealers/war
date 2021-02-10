@@ -158,6 +158,8 @@ public class WarPlayerListener implements Listener {
 		ItemStack newIt = item.clone();
 
 		long rate = Math.round(wpn.getRate()); //rate has to be 2 for Item Replacement
+		
+		final boolean playSound = wpn.getSound() != null;
 
 		if(PlayerRequests.hasArrow(player)) {
 			List<Arrow> firstShot = new ArrayList<Arrow>();
@@ -166,7 +168,8 @@ public class WarPlayerListener implements Listener {
 				Arrow arr = loc.getWorld().spawnArrow(loc,dir,wpn.getPower(),spread);
 				firstShot.add(arr);
 			}
-			player.getWorld().playSound(loc,wpn.getSound(), 1, 2);
+			if(playSound)player.getWorld().playSound(loc,wpn.getSound(), 1, 2);
+			
 			PlayerRequests.removeArrow(player);
 			for(Arrow arr : firstShot) {
 				arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wpn.getName(), War.war));
@@ -194,7 +197,8 @@ public class WarPlayerListener implements Listener {
 							Arrow arr = loc.getWorld().spawnArrow(loc,dir,wepn.getPower(),spread);
 							secondShot.add(arr);
 						}
-						player.getWorld().playSound(loc, wepn.getSound(), 1, 2);
+						if(playSound)player.getWorld().playSound(loc,wepn.getSound(), 1, 2);
+						
 						PlayerRequests.removeArrow(player);
 						for(Arrow arr : secondShot) {
 							arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wepn.getName(), War.war));
