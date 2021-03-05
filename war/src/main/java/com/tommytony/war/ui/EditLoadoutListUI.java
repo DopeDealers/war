@@ -113,9 +113,9 @@ class EditLoadoutListUI extends ChestUI {
 			size = team.getInventories().getNewLoadouts().size() + 1;
 		}
 		if (size % 9 == 0) {
-			return size / 9;
+			return size;
 		} else {
-			return size / 9 + 9;
+			return (size / 9 + 1) * 9;
 		}
 	}
 }

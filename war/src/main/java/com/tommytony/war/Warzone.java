@@ -1104,10 +1104,12 @@ public class Warzone {
 				smallestOpponent = cTeam;
 			}
 		}
-
-		if (((team.getPlayers().size() + 1) - smallestOpponent.getPlayers().size()) > team.getTeamConfig().resolveInt(TeamConfig.TEAMDIFFERENCE)) {
-			War.war.badMsg(player, "join.unfair");
-			return false;
+		
+		if (smallestOpponent != null) {
+			if (((team.getPlayers().size() + 1) - smallestOpponent.getPlayers().size()) > team.getTeamConfig().resolveInt(TeamConfig.TEAMDIFFERENCE)) {
+				War.war.badMsg(player, "join.unfair");
+				return false;
+			}
 		}
 
 		PermissionAttachment attachment = player.addAttachment(War.war);

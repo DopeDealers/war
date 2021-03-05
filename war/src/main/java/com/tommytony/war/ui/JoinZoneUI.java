@@ -60,9 +60,9 @@ public class JoinZoneUI extends ChestUI {
 	public int getSize() {
 		int zones = War.war.getEnabledWarzones().size() + 1;
 		if (zones % 9 == 0) {
-			return zones / 9;
+			return zones;
 		} else {
-			return zones / 9 + 9;
+			return (zones / 9 + 1) * 9;
 		}
 	}
 }

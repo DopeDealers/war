@@ -6,14 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
@@ -27,7 +26,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -90,8 +88,8 @@ import net.milkbowl.vault.economy.Economy;
 public class War extends JavaPlugin {
 	static final boolean HIDE_BLANK_MESSAGES = true;
 	public static War war;
-	YamlConfiguration lang = new YamlConfiguration();
 	private static ResourceBundle messages = ResourceBundle.getBundle("messages");
+	private static ResourceBundle messagesFallBack = ResourceBundle.getBundle("messages");
 	private final List<OfflinePlayer> zoneMakerNames = new ArrayList<>();
 	private final List<String> commandWhitelist = new ArrayList<String>();
 	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
@@ -142,6 +140,8 @@ public class War extends JavaPlugin {
 		if (!langFile.exists() || langFile.length() < 1) {
 			ClassLoader classLoader = war.getClass().getClassLoader();
 			InputStream input = classLoader.getResourceAsStream("messages_"+lang+".properties");
+			
+			
 			byte[] buffer = new byte[input.available()];
 			input.read(buffer);
 			
@@ -1340,7 +1340,12 @@ public class War extends JavaPlugin {
 	}
 
 	public String getString(String key) {
-		return messages.getString(key);
+		try {
+			return messages.getString(key);
+		} catch(MissingResourceException e) {
+			return messagesFallBack.getString(key);
+		}
+		
 	}
 
 	public Locale getLoadedLocale() {

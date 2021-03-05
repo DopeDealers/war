@@ -83,7 +83,7 @@ public class Weapon implements Comparable<Weapon> {
 	}
 	
 	public float getSpread(Player player) {
-		Float spr = spread;
+		float spr = spread;
 		
 		boolean inAir = false;
 		
