@@ -124,6 +124,8 @@ public class WarCommandHandler {
 				commandObj = new LoadWarCommand(this, sender, arguments);
 			} else if (command.equals("unloadwar")) {
 				commandObj = new UnloadWarCommand(this, sender, arguments);
+			} else if (command.equals("reloadwar")) {
+				commandObj = new ReloadWarCommand(this, sender, arguments);
 			} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {

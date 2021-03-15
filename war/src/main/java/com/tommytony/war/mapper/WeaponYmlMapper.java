@@ -35,6 +35,8 @@ public class WeaponYmlMapper {
 		weapons.clear();
 		List<Weapon> wpns = new ArrayList<Weapon>();
 		for (String name : weaponNames) {
+			upgradeConfig(name);
+			
 			double rate = config.getDouble(name + ".rate");	
 			float power = (float) config.getDouble(name + ".power");
 			float spread = (float) config.getDouble(name + ".spread");
@@ -49,8 +51,9 @@ public class WeaponYmlMapper {
 			int projectileCount = config.getInt(name + ".ProjectileCount");
 			int pierce = config.getInt(name + ".PierceLevel");
 			String sound = config.getString(name + ".sound");
+			String bullet = config.getString(name+".bullet");
 			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, sneSpread, sprSpread, jmpSpread, scopeSpread,
-					rapid, knockback, scope, damage, projectileCount, pierce, sound);
+					rapid, knockback, scope, damage, projectileCount, pierce, sound, bullet);
 			wpns.add(wpn);
 			weapons.put(name, rate);
 		}
@@ -59,9 +62,9 @@ public class WeaponYmlMapper {
 	}
 	
 	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread, float scopeSpread,
-			boolean rapid, int knockback, boolean scope, double damage, int projectileCount, int pierce, String sound) {
+			boolean rapid, int knockback, boolean scope, double damage, int projectileCount, int pierce, String sound, String bullet) {
 		return new Weapon(weaponName, rate, power, spread, sneSpread, sprSpread, jmpSpread, scopeSpread,
-				rapid, knockback, scope, damage, projectileCount, pierce, sound);
+				rapid, knockback, scope, damage, projectileCount, pierce, sound, bullet);
 	}
 	
 	public static void save() {
@@ -94,6 +97,7 @@ public class WeaponYmlMapper {
 		p90ConfigSection.set("rapid", true);
 		p90ConfigSection.set("scope", false);
 		p90ConfigSection.set("sound", "ENTITY_BLAZE_SHOOT");
+		p90ConfigSection.set("bullet", "ARROW");
 		
 		awpConfigSection.set("rate", 20);
 		awpConfigSection.set("power", 20);
@@ -109,6 +113,7 @@ public class WeaponYmlMapper {
 		awpConfigSection.set("rapid", false);
 		awpConfigSection.set("scope", true);
 		awpConfigSection.set("sound", "ENTITY_BLAZE_SHOOT");
+		awpConfigSection.set("bullet", "ARROW");
 		
 		novaConfigSection.set("rate", 5);
 		novaConfigSection.set("power", 7);
@@ -124,11 +129,27 @@ public class WeaponYmlMapper {
 		novaConfigSection.set("rapid", false);
 		novaConfigSection.set("scope", false);
 		novaConfigSection.set("sound", "ENTITY_BLAZE_SHOOT");
+		novaConfigSection.set("bullet", "ARROW");
 		
 		// Save to disk
 		File wpnConfigFile = new File(War.war.getDataFolder().getPath() + "/weapons.yml");
 		try {
 			wpnYmlConfig.save(wpnConfigFile);
+		} catch (IOException e) {
+			War.war.log("Failed to save weapon.yml", Level.WARNING);
+			e.printStackTrace();
+		}
+	}
+	
+	//Upgrade configs newer than 2.6.0
+	private static void upgradeConfig(String name) {
+		File wpnYmlFile = new File(War.war.getDataFolder().getPath() + "/weapons.yml");
+		YamlConfiguration wpnYmlConfig = YamlConfiguration.loadConfiguration(wpnYmlFile);
+		if(!wpnYmlConfig.contains("weapons."+name+".bullet")) {
+			wpnYmlConfig.set("weapons."+name+".bullet", "ARROW");
+		}
+		try {
+			wpnYmlConfig.save(wpnYmlFile);
 		} catch (IOException e) {
 			War.war.log("Failed to save weapon.yml", Level.WARNING);
 			e.printStackTrace();

@@ -137,19 +137,40 @@ public class War extends JavaPlugin {
 		File langFile = new File(war.getDataFolder().getAbsolutePath()
 				+ File.separator + "messages_"+lang+".properties");
 		
+		//Create Lang-File
 		if (!langFile.exists() || langFile.length() < 1) {
 			ClassLoader classLoader = war.getClass().getClassLoader();
 			InputStream input = classLoader.getResourceAsStream("messages_"+lang+".properties");
 			
+			if(input == null) {
+				input = classLoader.getResourceAsStream("messages_"+parts[0]+".properties");
+				if(input == null) {
+					input = classLoader.getResourceAsStream("messages.properties");
+				}
+			}
 			
 			byte[] buffer = new byte[input.available()];
 			input.read(buffer);
 			
 			OutputStream output = new FileOutputStream(langFile);
 			output.write(buffer);
-			// newC.save(configFile);
+			//newC.save(configFile);
 		}
 		
+		//Create Reference-File
+		File referenceFile = new File(war.getDataFolder().getAbsolutePath()
+				+ File.separator + "reference.properties");
+		if(!referenceFile.exists() || referenceFile.length() < 1) {
+			ClassLoader classLoader2 = war.getClass().getClassLoader();
+			InputStream input2 = classLoader2.getResourceAsStream("messages.properties");
+			
+			byte[] buffer2 = new byte[input2.available()];
+			input2.read(buffer2);
+			
+			OutputStream output2 = new FileOutputStream(referenceFile);
+			output2.write(buffer2);
+		}
+			
 		FileInputStream fis = new FileInputStream(langFile.getAbsolutePath());
         try {
             War.messages = new PropertyResourceBundle(fis);

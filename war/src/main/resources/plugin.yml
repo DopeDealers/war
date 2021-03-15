@@ -277,6 +277,9 @@ commands:
   loadwar:
     description: Enables the War plugin.
     usage: /<command>
+  reloadwar:
+    description: Reloads the War plugin.
+    usage: /<command>
   warcfg:
     description: |
       Change War global settings.

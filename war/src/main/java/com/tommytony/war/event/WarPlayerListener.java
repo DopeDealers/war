@@ -161,7 +161,7 @@ public class WarPlayerListener implements Listener {
 		
 		final boolean playSound = wpn.getSound() != null;
 
-		if(PlayerRequests.hasArrow(player)) {
+		if(PlayerRequests.hasBullet(player,wpn.getBullet())) {
 			List<Arrow> firstShot = new ArrayList<Arrow>();
 			float spread = wpn.getSpread(player);
 			for(int i = 0;i < wpn.getProjectileCount(); i++) {
@@ -170,7 +170,7 @@ public class WarPlayerListener implements Listener {
 			}
 			if(playSound)player.getWorld().playSound(loc,wpn.getSound(), 1, 2);
 			
-			PlayerRequests.removeArrow(player);
+			PlayerRequests.removeBullet(player, wpn.getBullet());
 			for(Arrow arr : firstShot) {
 				arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wpn.getName(), War.war));
 				arr.setBounce(false);
@@ -190,7 +190,7 @@ public class WarPlayerListener implements Listener {
 			Bukkit.getScheduler().runTaskLater(War.war, new Runnable() { //Rate under 2 requires extra shot
 				@Override
 				public void run() {
-					if(PlayerRequests.hasArrow(player)) {
+					if(PlayerRequests.hasBullet(player,wepn.getBullet())) {
 						List<Arrow> secondShot = new ArrayList<Arrow>();
 						float spread = wepn.getSpread(player);
 						for(int i = 0;i < wepn.getProjectileCount(); i++) {
@@ -199,7 +199,7 @@ public class WarPlayerListener implements Listener {
 						}
 						if(playSound)player.getWorld().playSound(loc,wepn.getSound(), 1, 2);
 						
-						PlayerRequests.removeArrow(player);
+						PlayerRequests.removeBullet(player, wepn.getBullet());
 						for(Arrow arr : secondShot) {
 							arr.setMetadata("WarPluginCustomWeapon", new MetadataValue(wepn.getName(), War.war));
 							arr.setBounce(false);

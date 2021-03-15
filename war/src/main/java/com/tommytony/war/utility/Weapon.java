@@ -27,10 +27,11 @@ public class Weapon implements Comparable<Weapon> {
 	private int projectileCount;
 	private int pierce;
 	private Sound sound;
+	private String bullet;
 		
 	public Weapon(String name, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread, float scopeSpread,
 			boolean rapid, int knockback,
-			boolean scope, double damage, int projectileCount, int pierce, String sound) {
+			boolean scope, double damage, int projectileCount, int pierce, String sound, String bullet) {
 		this.name = name;
 		this.rate = rate;
 		this.power = power;
@@ -39,6 +40,11 @@ public class Weapon implements Comparable<Weapon> {
 		this.sneSpread = sneSpread;
 		this.sprSpread = sprSpread;	
 		this.jmpSpread = jmpSpread;
+		if(scopeSpread == 0.0) {
+			this.scopeSpread = 0.0001f;
+		} else {
+			this.scopeSpread = scopeSpread;
+		}
 		this.scopeSpread = scopeSpread;
 		
 		this.rapid = rapid;
@@ -55,6 +61,11 @@ public class Weapon implements Comparable<Weapon> {
 			}
 		} else {
 			this.sound = null;
+		}
+		if(bullet == "") {
+			this.bullet = "ARROW";
+		} else {
+			this.bullet = bullet;
 		}
 	}
 	
@@ -129,6 +140,10 @@ public class Weapon implements Comparable<Weapon> {
 	
 	public Sound getSound() {
 		return sound;
+	}
+	
+	public String getBullet() {
+		return bullet;
 	}
 	
 	public static Weapon getWeaponByString(String wpnName) {
