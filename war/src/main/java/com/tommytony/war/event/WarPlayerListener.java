@@ -80,6 +80,7 @@ import com.tommytony.war.volume.Volume;
 public class WarPlayerListener implements Listener {
 	private java.util.Random random = new java.util.Random();
 	private HashMap<String, Location> latestLocations = new HashMap<String, Location>();
+	private HashMap<Player, Weapon> gunWait = new HashMap<Player, Weapon>();
 
 	/**
 	 * Correctly removes quitting players from warzones
@@ -124,12 +125,13 @@ public class WarPlayerListener implements Listener {
 		Weapon wpn = null;
 		for(Weapon wp : War.war.getWeapons()) {
 			if(item.getItemMeta().getDisplayName().toLowerCase().equals(wp.getName().toLowerCase())) {
+				if(gunWait.containsKey(event.getPlayer()) && gunWait.get(event.getPlayer()) == wp) {
+					event.setCancelled(true);
+					return;
+				}
 				isWeapon = true;
 				wpn = wp;
 				break;
-			} else if(item.getItemMeta().getDisplayName().toLowerCase().equals("."+wp.getName().toLowerCase()+".")) {
-				event.setCancelled(true);
-				return;
 			}
 		}
 		if(!isWeapon) {
@@ -185,7 +187,7 @@ public class WarPlayerListener implements Listener {
 			return;
 		}
 		
-		if(rate < 2 && wpn.getRapid()) {
+		if(rate < 2 && wpn.getRapid()) { //Super Fast
 			final Weapon wepn = wpn;
 			Bukkit.getScheduler().runTaskLater(War.war, new Runnable() { //Rate under 2 requires extra shot
 				@Override
@@ -214,16 +216,13 @@ public class WarPlayerListener implements Listener {
 			}, 3);
 			rate = 2;
 		}
-		if(player.getWalkSpeed() < 0) {
+		if(player.getWalkSpeed() < 0) { //Reset Scope
 			player.setWalkSpeed(0.2f);
 		}
 		
 		int slot = -1;
 		if(wpn.getRapid() && Warzone.getZoneByLocation(event.getPlayer()) != null) {
 			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will be changed and later removed
-				ItemMeta newMeta = item.getItemMeta().clone();
-				newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
-				item.setItemMeta(newMeta);
 				final ItemStack remItem = item.clone();
 				final boolean offH = offHand;
 				slot = player.getInventory().first(item);
@@ -253,34 +252,22 @@ public class WarPlayerListener implements Listener {
 				}
 			}
 		} else if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
-			ItemMeta newMeta = item.getItemMeta().clone();
-			newMeta.setDisplayName("."+item.getItemMeta().getDisplayName()+".");
-			item.setItemMeta(newMeta);
+			gunWait.put(player, wpn);
 		}
 		
 		
-		ItemStack it = item;
 		int slt = slot;
 		Weapon wepn = wpn;
+		final boolean offH = offHand;
 		Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
 			@Override
 			public void run() {
-				if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
-					int sl = slt;
-					if(!wepn.getRapid()) {
-						sl = player.getInventory().first(it);
-					}
-					if(sl == -1 && player.getInventory().getItemInOffHand().equals(it)) { //Yay hand-switching
+				gunWait.remove(player);
+				if(Warzone.getZoneByLocation(event.getPlayer()) != null && wepn.getRapid()) {
+					if(offH) { //Yay OffHand
 						player.getInventory().setItemInOffHand(newIt);
-					} else if(sl != -1) {
-					    player.getInventory().setItem(sl, newIt);
-					}
-					if(wepn.getRapid() && wepn.getRate() > 2) {
-						if(player.getInventory().contains(it)) {
-							player.getInventory().remove(it);
-						} else if (player.getInventory().getItemInOffHand().equals(it)) {
-							player.getInventory().setItemInOffHand(null);
-						}
+					} else if(slt != -1) {
+					    player.getInventory().setItem(slt, newIt);
 					}
 				}
 			}
