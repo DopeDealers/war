@@ -48,12 +48,13 @@ public class WeaponYmlMapper {
 			boolean rapid = config.getBoolean(name + ".rapid");
 			boolean scope = config.getBoolean(name + ".scope");
 			double damage = config.getDouble(name + ".damage");
+			double HSDamage = config.getDouble(name + ".headshotDamage");
 			int projectileCount = config.getInt(name + ".ProjectileCount");
 			int pierce = config.getInt(name + ".PierceLevel");
 			String sound = config.getString(name + ".sound");
 			String bullet = config.getString(name+".bullet");
 			Weapon wpn = fromConfigToWeapon(name, rate, power, spread, sneSpread, sprSpread, jmpSpread, scopeSpread,
-					rapid, knockback, scope, damage, projectileCount, pierce, sound, bullet);
+					rapid, knockback, scope, damage, HSDamage, projectileCount, pierce, sound, bullet);
 			wpns.add(wpn);
 			weapons.put(name, rate);
 		}
@@ -62,9 +63,9 @@ public class WeaponYmlMapper {
 	}
 	
 	public static Weapon fromConfigToWeapon(String weaponName, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread, float scopeSpread,
-			boolean rapid, int knockback, boolean scope, double damage, int projectileCount, int pierce, String sound, String bullet) {
+			boolean rapid, int knockback, boolean scope, double damage, double HSDamage, int projectileCount, int pierce, String sound, String bullet) {
 		return new Weapon(weaponName, rate, power, spread, sneSpread, sprSpread, jmpSpread, scopeSpread,
-				rapid, knockback, scope, damage, projectileCount, pierce, sound, bullet);
+				rapid, knockback, scope, damage, HSDamage, projectileCount, pierce, sound, bullet);
 	}
 	
 	public static void save() {
@@ -91,6 +92,7 @@ public class WeaponYmlMapper {
 		p90ConfigSection.set("scopeSpread", 1);
 		p90ConfigSection.set("additionalJumpSpread", 2.5);
 		p90ConfigSection.set("damage", 3);
+		p90ConfigSection.set("headshotDamage", 7);
 		p90ConfigSection.set("knockback", 0);
 		p90ConfigSection.set("PierceLevel", 0);
 		p90ConfigSection.set("ProjectileCount", 1);
@@ -107,6 +109,7 @@ public class WeaponYmlMapper {
 		awpConfigSection.set("scopeSpread", 3);
 		awpConfigSection.set("additionalJumpSpread", 5);
 		awpConfigSection.set("damage", 20);
+		awpConfigSection.set("headshotDamage", 25);
 		awpConfigSection.set("knockback", 0);
 		awpConfigSection.set("PierceLevel", 1);
 		awpConfigSection.set("ProjectileCount", 1);
@@ -123,6 +126,7 @@ public class WeaponYmlMapper {
 		novaConfigSection.set("scopeSpread", 1);
 		novaConfigSection.set("additionalJumpSpread", 3);
 		novaConfigSection.set("damage", 7);
+		novaConfigSection.set("headshotDamage", 10);
 		novaConfigSection.set("knockback", 0);
 		novaConfigSection.set("PierceLevel", 0);
 		novaConfigSection.set("ProjectileCount", 7);
@@ -147,6 +151,10 @@ public class WeaponYmlMapper {
 		YamlConfiguration wpnYmlConfig = YamlConfiguration.loadConfiguration(wpnYmlFile);
 		if(!wpnYmlConfig.contains("weapons."+name+".bullet")) {
 			wpnYmlConfig.set("weapons."+name+".bullet", "ARROW");
+		}
+		if(!wpnYmlConfig.contains("weapons."+name+".headshotDamage")) {
+			double HSDamage = wpnYmlConfig.getDouble("weapons."+name+".damage") + 2;
+			wpnYmlConfig.set("weapons."+name+".headshotDamage", HSDamage);
 		}
 		try {
 			wpnYmlConfig.save(wpnYmlFile);

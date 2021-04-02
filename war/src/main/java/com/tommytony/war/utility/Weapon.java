@@ -24,14 +24,15 @@ public class Weapon implements Comparable<Weapon> {
 	private int knockback;
 	private boolean scope;
 	private double damage;
+	private double HSDamage;
 	private int projectileCount;
 	private int pierce;
 	private Sound sound;
 	private String bullet;
 		
 	public Weapon(String name, double rate, float power, float spread, float sneSpread, float sprSpread, float jmpSpread, float scopeSpread,
-			boolean rapid, int knockback,
-			boolean scope, double damage, int projectileCount, int pierce, String sound, String bullet) {
+			boolean rapid, int knockback, boolean scope,
+			double damage, double HSDamage, int projectileCount, int pierce, String sound, String bullet) {
 		this.name = name;
 		this.rate = rate;
 		this.power = power;
@@ -51,6 +52,7 @@ public class Weapon implements Comparable<Weapon> {
 		this.knockback = knockback;
 		this.scope = scope;
 		this.damage = damage;
+		this.HSDamage = HSDamage;
 		this.projectileCount = projectileCount;
 		this.pierce = pierce;
 		if(sound != null && !sound.equals("")) {
@@ -128,6 +130,10 @@ public class Weapon implements Comparable<Weapon> {
 	
 	public double getDamage() {
 		return damage;
+	}
+	
+	public double getHeadshotDamage() {
+		return HSDamage;
 	}
 	
 	public int getProjectileCount() {

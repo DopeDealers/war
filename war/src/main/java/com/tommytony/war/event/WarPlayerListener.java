@@ -18,8 +18,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Event.Result;
@@ -50,7 +52,6 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.tommytony.war.Team;
@@ -286,8 +287,17 @@ public class WarPlayerListener implements Listener {
 		
 		String wpnName = event.getDamager().getMetadata("WarPluginCustomWeapon").get(0).value().toString();
 		Weapon wpn = Weapon.getWeaponByString(wpnName);
-
-		event.setDamage(wpn.getDamage());
+		double arrowY = event.getDamager().getLocation().getY();
+		double damagedY = event.getEntity().getLocation().getY();
+		double damagedNeck = (event.getEntity().getBoundingBox().getHeight() / 16) * 10.5; //Hitboxes are strange...
+		
+		if (arrowY - damagedY > damagedNeck) {
+			event.setDamage(wpn.getHeadshotDamage());
+		} else {
+			event.setDamage(wpn.getDamage());
+		}
+		Bukkit.getConsoleSender().sendMessage(arrowY+ " "+damagedY+" "+damagedNeck+" "+(arrowY-damagedY));
+		Bukkit.getConsoleSender().sendMessage(""+event.getDamage() + " " + event.getFinalDamage());
 	}
 	
 	@EventHandler
