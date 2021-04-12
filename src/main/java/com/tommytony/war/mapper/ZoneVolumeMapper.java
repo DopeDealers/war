@@ -31,7 +31,7 @@ public class ZoneVolumeMapper extends VolumeMapper {
 	 * @throws SQLException
 	 */
 	public static Connection getZoneConnection(ZoneVolume volume, String zoneName) throws SQLException {
-		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName.toLowerCase(), volume.getName()));
+		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		if (!databaseFile.exists()) {
 			// dropped nimitz compatibility with the MC 1.13 update
 			War.war.log("Warzone " + zoneName + " not found - creating new file. Will not attempt converting legacy War version formats.", Level.WARNING);
@@ -85,7 +85,7 @@ public class ZoneVolumeMapper extends VolumeMapper {
 	public static int reloadZoneBlocks(Connection databaseConnection, ZoneVolume volume, int start, int total, boolean[][][] changes) throws SQLException {
 		return loadBlocks(databaseConnection, volume, start, total, changes, false, "", false);
 	}
-	
+
 	public static int reloadZoneChests(Connection databaseConnection, ZoneVolume volume, int start, int total, boolean[][][] changes) throws SQLException {
 		return loadBlocks(databaseConnection, volume, start, total, changes, false, "", true);
 	}

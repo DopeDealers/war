@@ -10,7 +10,7 @@
 
 # Ignore bin
 bin
-*/lib/*
-*/target/*
+lib/*
+target/*
 dependency-reduced-pom.xml
 
