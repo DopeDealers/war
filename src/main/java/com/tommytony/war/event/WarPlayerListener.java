@@ -217,13 +217,18 @@ public class WarPlayerListener implements Listener {
 			}, 3);
 			rate = 2;
 		}
+		
+		if(!wpn.getRapid() && !wpn.getBullet().contains("ARROW")) {
+			player.getInventory().setItem(17, new ItemStack(Material.ARROW, 1));
+		}
+		
 		if(player.getWalkSpeed() < 0) { //Reset Scope
 			player.setWalkSpeed(0.2f);
 		}
 		
 		int slot = -1;
 		if(wpn.getRapid() && Warzone.getZoneByLocation(event.getPlayer()) != null) {
-			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will be changed and later removed
+			if(rate > 2) {//If rapid and rate lower than 3 it will be removed otherwise it will removed later
 				final ItemStack remItem = item.clone();
 				final boolean offH = offHand;
 				slot = player.getInventory().first(item);
@@ -264,6 +269,7 @@ public class WarPlayerListener implements Listener {
 			@Override
 			public void run() {
 				gunWait.remove(player);
+				player.getInventory().remove(new ItemStack(Material.ARROW, 1));
 				if(Warzone.getZoneByLocation(event.getPlayer()) != null && wepn.getRapid()) {
 					if(offH) { //Yay OffHand
 						player.getInventory().setItemInOffHand(newIt);

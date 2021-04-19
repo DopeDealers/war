@@ -33,7 +33,8 @@ public class WarzonesCommand extends AbstractWarCommand {
 						warzone.getName(), warzone.getTeams().size(), warzone.getPlayerCount()));
 			}
 		}
-
+		
+		warzonesMessage.append('\n');
 		this.msg(warzonesMessage.toString() + ((this.getSender() instanceof Player) ? War.war.getString("zone.zoneinfo.teleport") : ""));
 
 		return true;
