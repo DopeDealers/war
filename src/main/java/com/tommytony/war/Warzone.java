@@ -124,8 +124,8 @@ public class Warzone {
 	private Location teleport;
 	private ZoneLobby lobby;
 	private Location rallyPoint;
-	public Scoreboard board = null;
-	public Objective teamDisplay = null;
+	//public Scoreboard board = null;
+	//public Objective teamDisplay = null;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
 	private HashMap<UUID, Team> flagThieves = new HashMap<UUID, Team>();
@@ -164,19 +164,16 @@ public class Warzone {
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
 		this.lobbyMaterials = War.war.getWarhubMaterials().clone();
 		this.pvpReady = true;
-		this.scoreboardType = this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
-		if (scoreboardType == ScoreboardType.SWITCHING)
-			scoreboardType = ScoreboardType.LIFEPOOL;
-
-		Bukkit.getScheduler().runTask(War.war, new Runnable(){
-
+		
+		/*Bukkit.getScheduler().runTask(War.war, new Runnable(){	//Seemingly a planned feature to show the team name above the player?
+																	//Scoreboards are evil so cut for now
 			@Override
 			public void run() {
 				board = War.war.getServer().getScoreboardManager().getNewScoreboard();
-				teamDisplay = board.registerNewObjective(" ", "dummy"," ");
+				teamDisplay = board.registerNewObjective(name+"team", "dummy"," ");
 				teamDisplay.setDisplaySlot(DisplaySlot.BELOW_NAME);
 				return;
-			}});
+			}}); */
 	}
 
 	public static Warzone getZoneByName(String name) {
@@ -403,6 +400,11 @@ public class Warzone {
 	}
 
 	private void initZone() {
+		//Set Scoreboard-Type
+		this.scoreboardType = this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
+		if (scoreboardType == ScoreboardType.SWITCHING)
+			scoreboardType = ScoreboardType.LIFEPOOL;
+		
 		// reset monuments
 		for (Monument monument : this.monuments) {
 			monument.getVolume().resetBlocks();

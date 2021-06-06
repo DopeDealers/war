@@ -1,5 +1,7 @@
 package com.tommytony.war.config;
 
+import org.bukkit.Bukkit;
+
 public enum ScoreboardType {
 
 	NONE(null),

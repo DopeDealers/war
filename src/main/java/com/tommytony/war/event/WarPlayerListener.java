@@ -302,8 +302,6 @@ public class WarPlayerListener implements Listener {
 		} else {
 			event.setDamage(wpn.getDamage());
 		}
-		Bukkit.getConsoleSender().sendMessage(arrowY+ " "+damagedY+" "+damagedNeck+" "+(arrowY-damagedY));
-		Bukkit.getConsoleSender().sendMessage(""+event.getDamage() + " " + event.getFinalDamage());
 	}
 	
 	@EventHandler

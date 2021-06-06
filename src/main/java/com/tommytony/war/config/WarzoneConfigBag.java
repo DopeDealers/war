@@ -81,7 +81,6 @@ public class WarzoneConfigBag {
 			return (String)bag.get(config);
 		} else {
 			// use War default config
-			Bukkit.getConsoleSender().sendMessage("Eh");
 			return War.war.getWarzoneDefaultConfig().getString(config);
 		}
 	}
