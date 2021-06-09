@@ -1,6 +1,8 @@
 ![War logo](http://i.imgur.com/LFdiF.png "War - Minecraft PVP Arenas - TDM, CTF and more!")
 
 War - Minecraft PVP Arenas (TDM, CTF and more!)
+This is an updated version that is expected to work for 1.16+
+(should technically work für 1.13+)
 ===============================================
 
 War is a plugin for Bukkit that adds PVP arenas and team deathmatch gamemodes to Minecraft servers.
@@ -16,7 +18,7 @@ Features
 - Warzone blocks are saved and reset at the end of every game, for safely destructible maps
 - Other game types: capture points and explosive-based objectives
 - Up to 16 teams!
-- Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))
+- Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))Cancel changes
 
 Downloads
 ---------
