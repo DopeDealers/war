@@ -1,8 +1,6 @@
 ![War logo](http://i.imgur.com/LFdiF.png "War - Minecraft PVP Arenas - TDM, CTF and more!")
 
-War - Minecraft PVP Arenas (TDM, CTF and more!)
-This is an updated version that is expected to work for 1.16+
-(should technically work für 1.13+)
+War 1.16+ - Minecraft PVP Arenas (TDM, CTF and more!)
 ===============================================
 
 War is a plugin for Bukkit that adds PVP arenas and team deathmatch gamemodes to Minecraft servers.
