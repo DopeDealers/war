@@ -16,7 +16,7 @@ Features
 - Warzone blocks are saved and reset at the end of every game, for safely destructible maps
 - Other game types: capture points and explosive-based objectives
 - Up to 16 teams!
-- Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))Cancel changes
+- Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))
 
 Downloads
 ---------
