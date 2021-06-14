@@ -240,6 +240,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);
 		warzoneDefaultConfig.put(WarzoneConfig.DISABLED, false);
 		warzoneDefaultConfig.put(WarzoneConfig.FRIENDLYFIRE, false);
+		warzoneDefaultConfig.put(WarzoneConfig.ENTRYALLOW, false);
 		warzoneDefaultConfig.put(WarzoneConfig.GLASSWALLS, true);
 		warzoneDefaultConfig.put(WarzoneConfig.INSTABREAK, false);
 		warzoneDefaultConfig.put(WarzoneConfig.MINPLAYERS, 1);

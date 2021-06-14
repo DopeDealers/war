@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
@@ -246,7 +247,7 @@ public class ZoneSetter {
 			War.war.msg(this.player, msgString.toString());
 			warzone.saveState(false); // we just changed the volume, cant reset walls
 			
-			if (warzone.getLobby() == null) {
+			if (warzone.getLobby() == null && !warzone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
 				// Set default lobby on south side
 				ZoneLobby lobby = new ZoneLobby(warzone, Direction.SOUTH());
 				warzone.setLobby(lobby);

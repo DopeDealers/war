@@ -400,14 +400,16 @@ public class WarzoneYmlMapper {
 			World lobbyWorld = War.war.getServer().getWorld(lobbyWorldName);
 						
 			// create the lobby
-			Volume lobbyVolume = null;
-			try {
-				lobbyVolume = warzone.loadStructure("lobby", lobbyWorld, connection);
-			} catch (SQLException e) {
-				War.war.getLogger().log(Level.WARNING, "Failed to load warzone lobby", e);
+			if(!warzone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
+				Volume lobbyVolume = null;
+				try {
+					lobbyVolume = warzone.loadStructure("lobby", lobbyWorld, connection);
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load warzone lobby", e);
+				}
+				ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
+				warzone.setLobby(lobby);
 			}
-			ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
-			warzone.setLobby(lobby);
 			
 			// warzone materials
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.main")) {

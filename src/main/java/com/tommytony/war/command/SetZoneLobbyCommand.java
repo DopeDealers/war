@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
@@ -50,6 +51,8 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 				return false;
 			} else if (!this.isSenderAuthorOfZone(givenWarzone)) {
 				return true;
+			} else if (givenWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
+				return false;
 			} else {
 				// Move the warzone lobby
 				ZoneLobby lobby = givenWarzone.getLobby();
@@ -76,7 +79,7 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 		} else {
 			// Inside a warzone: use the classic n/s/e/w mode
 			if (!this.args[0].equals("north") && !this.args[0].equals("n") && !this.args[0].equals("east") && !this.args[0].equals("e") && !this.args[0].equals("south") && !this.args[0].equals("s") && !this.args[0].equals("west") && !this.args[0].equals("w")) {
-				if (Warzone.getZoneByName(this.args[0]) == zone && origLobby != null) {
+				if (Warzone.getZoneByName(this.args[0]) == zone && origLobby != null && !zone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
 					origLobby.setLocation(player.getLocation());
 					origLobby.initialize();
 					this.msg("Warzone lobby moved to your location.");
