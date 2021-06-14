@@ -20,13 +20,13 @@ Features
 
 Downloads
 ---------
-All official releases are at https://github.com/taoneill/war/downloads.
+You can find the newest release at github.com/Jakllp/war/releases/tag/latest.
 
-Dev Builds
+Older/Pre Releases
 ----------
-Development builds are available at https://cmastudios.me/cgi-bin/war.py.
+All releases, including pre-releases are available at github.com/Jakllp/war/releases/.
 
-Author
+Original-Author
 ------
 tommytony started the plugin in December 2010 on hMod and has been maintaining it since with the help of contributors.
 Reach him at taoneill@tommytony.com.
