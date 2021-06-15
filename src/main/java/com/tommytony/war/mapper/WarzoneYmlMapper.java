@@ -400,16 +400,15 @@ public class WarzoneYmlMapper {
 			World lobbyWorld = War.war.getServer().getWorld(lobbyWorldName);
 						
 			// create the lobby
-			if(!warzone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
-				Volume lobbyVolume = null;
-				try {
-					lobbyVolume = warzone.loadStructure("lobby", lobbyWorld, connection);
-				} catch (SQLException e) {
-					War.war.getLogger().log(Level.WARNING, "Failed to load warzone lobby", e);
-				}
-				ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
-				warzone.setLobby(lobby);
+			Volume lobbyVolume = null;
+			try {
+				lobbyVolume = warzone.loadStructure("lobby", lobbyWorld, connection);
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to load warzone lobby", e);
 			}
+			ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
+			warzone.setLobby(lobby);
+			
 			
 			// warzone materials
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.main")) {
@@ -484,6 +483,8 @@ public class WarzoneYmlMapper {
 			lobbySection.set("materials.outline", warzone.getLobbyMaterials().getOutlineBlock());
 			lobbySection.set("materials.gate", warzone.getLobbyMaterials().getGateBlock());
 			lobbySection.set("materials.light", warzone.getLobbyMaterials().getLightBlock());
+		} else {
+			Bukkit.getConsoleSender().sendMessage("Lobby is now null for some reason. Please report this in an issue on the War-Github-Page (with console-output of previous activities)");
 		}
 		
 		// materials

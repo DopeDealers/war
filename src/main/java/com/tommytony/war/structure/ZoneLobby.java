@@ -284,6 +284,9 @@ public class ZoneLobby {
 	}
 
 	public void initialize() {
+		if(this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
+			return;
+		}
 		// maybe the number of teams change, now reset the gate positions
 		if (this.lobbyMiddleWallBlock != null && this.volume != null) {
 			this.setGatePositions(this.lobbyMiddleWallBlock.getBlock());

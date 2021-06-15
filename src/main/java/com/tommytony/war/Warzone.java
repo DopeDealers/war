@@ -1141,8 +1141,6 @@ public class Warzone {
 				}
 			}
 		}
-		
-		player.setMaximumNoDamageTicks(0);
 
 		War.war.msg(player, "join.inventorystored");
 		this.respawnPlayer(team, player);
@@ -1410,7 +1408,6 @@ public class Warzone {
 		if (playerTeam != null) {
 			this.showNametags(player, playerTeam);
 
-			player.setMaximumNoDamageTicks(20);
 			playerTeam.removePlayer(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
@@ -1651,7 +1648,6 @@ public class Warzone {
 				
 				it.remove(); // Remove player from team first to prevent anti-tp
 				t.removePlayer(tp);
-				tp.setMaximumNoDamageTicks(20);
 				tp.teleport(this.getEndTeleport(LeaveCause.SCORECAP));
 				if (winnersStr.contains(t.getName())) {
 					// give reward
@@ -1717,7 +1713,6 @@ public class Warzone {
 		for (Team team : this.getTeams()) {
 			for (Iterator<Player> it = team.getPlayers().iterator(); it.hasNext(); ) {
 				final Player player = it.next();
-				player.setMaximumNoDamageTicks(20);
 				it.remove();
 				team.removePlayer(player);
 				player.teleport(this.getTeleport());

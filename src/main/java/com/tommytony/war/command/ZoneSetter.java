@@ -245,18 +245,17 @@ public class ZoneSetter {
 			WarYmlMapper.save();
 			msgString.append("Saving new warzone blocks...");
 			War.war.msg(this.player, msgString.toString());
-			warzone.saveState(false); // we just changed the volume, cant reset walls
+			warzone.saveState(false); // we just changed the volume, can't reset walls
 			
-			if (warzone.getLobby() == null && !warzone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY)) {
-				// Set default lobby on south side
-				ZoneLobby lobby = new ZoneLobby(warzone, Direction.SOUTH());
-				warzone.setLobby(lobby);
-				if (War.war.getWarHub() != null) { // warhub has to change
-					War.war.getWarHub().getVolume().resetBlocks();
-					War.war.getWarHub().initialize();
-				}
-				War.war.msg(this.player, "Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change its position.");
+			// Set default lobby on south side
+			ZoneLobby lobby = new ZoneLobby(warzone, Direction.SOUTH());
+			warzone.setLobby(lobby);
+			if (War.war.getWarHub() != null) { // warhub has to change
+				War.war.getWarHub().getVolume().resetBlocks();
+				War.war.getWarHub().initialize();
 			}
+			War.war.msg(this.player, "Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change its position.");
+
 			
 			warzone.initializeZone();
 			WarzoneYmlMapper.save(warzone);

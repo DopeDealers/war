@@ -257,6 +257,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.UNBREAKABLE, false);
 		warzoneDefaultConfig.put(WarzoneConfig.DEATHMESSAGES, true);
 		warzoneDefaultConfig.put(WarzoneConfig.JOINMIDBATTLE, true);
+		warzoneDefaultConfig.put(WarzoneConfig.NOLOBBY, false);
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOJOIN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SCOREBOARD, ScoreboardType.NONE);
 		warzoneDefaultConfig.put(WarzoneConfig.SOUPHEALING, false);
@@ -267,6 +268,8 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.CAPTUREPOINTTIME, 15);
 		warzoneDefaultConfig.put(WarzoneConfig.CPRADIUS, 3);
 		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);
+		warzoneDefaultConfig.put(WarzoneConfig.DISABLECOOLDOWN, false);
+		warzoneDefaultConfig.put(WarzoneConfig.RAPIDDAMAGE, true);
 		warzoneDefaultConfig.put(WarzoneConfig.GAMEMODE, "SURVIVAL");
 
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);

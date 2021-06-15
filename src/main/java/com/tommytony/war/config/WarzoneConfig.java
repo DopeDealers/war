@@ -33,6 +33,8 @@ public enum WarzoneConfig {
 	ENEMYNAMES (Boolean.class, "Seeing Enemy Names", "If true, players can see enemy names"),
 	CPRADIUS (Integer.class, "CapturePoint-Radius", "Defines the Capture-Point-Radius"),
 	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point"),
+	DISABLECOOLDOWN (Boolean.class, "Disable combat cooldown", "Disables the attack cooldown when swinging a weapon"),
+	RAPIDDAMAGE (Boolean.class, "Allow rapid damage", "Allows for rapid damage to the players (e.g. machine guns)"),
 	PREPTIME(Integer.class, "Preparation Time", "Time, in seconds, before players are allowed to fight");
 	
 	

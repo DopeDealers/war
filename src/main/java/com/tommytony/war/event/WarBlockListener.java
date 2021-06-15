@@ -80,7 +80,7 @@ public class WarBlockListener implements Listener {
 
 		// protect warzone lobbies
 		for (Warzone wz : War.war.getWarzones()) {
-			if (wz.getLobby() != null && wz.getLobby().getVolume() != null && wz.getLobby().getVolume().contains(block)) {
+			if (wz.getLobby() != null && !wz.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY) && wz.getLobby().getVolume() != null && wz.getLobby().getVolume().contains(block)) {
 				War.war.badMsg(player, "build.denied.location");
 				cancelAndKeepItem(event);
 				return;
@@ -352,7 +352,7 @@ public class WarBlockListener implements Listener {
 		// protect warzone lobbies
 		if (block != null) {
 			for (Warzone zone : War.war.getWarzones()) {
-				if (zone.getLobby() != null && zone.getLobby().getVolume() != null && zone.getLobby().getVolume().contains(block)) {
+				if (zone.getLobby() != null && !zone.getWarzoneConfig().getBoolean(WarzoneConfig.NOLOBBY) && zone.getLobby().getVolume() != null && zone.getLobby().getVolume().contains(block)) {
 					War.war.badMsg(player, "build.denied.location");
 					event.setCancelled(true);
 					return;

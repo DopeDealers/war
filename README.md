@@ -16,17 +16,17 @@ Features
 - Warzone blocks are saved and reset at the end of every game, for safely destructible maps
 - Other game types: capture points and explosive-based objectives
 - Up to 16 teams!
-- Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))Cancel changes
+- Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))
 
 Downloads
 ---------
-All official releases are at https://github.com/taoneill/war/downloads.
+You can find the newest release at github.com/Jakllp/war/releases/tag/latest.
 
-Dev Builds
+Older/Pre Releases
 ----------
-Development builds are available at https://cmastudios.me/cgi-bin/war.py.
+All releases, including pre-releases are available at github.com/Jakllp/war/releases/.
 
-Author
+Original Author
 ------
 tommytony started the plugin in December 2010 on hMod and has been maintaining it since with the help of contributors.
 Reach him at taoneill@tommytony.com.

@@ -1130,7 +1130,7 @@ public class WarPlayerListener implements Listener {
 				playerWarzone.getLoadoutSelections().get(player.getName()).setStillInSpawn(false);
 			}
 
-		} else if (locZone != null && locZone.getLobby() != null && !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker && locZone.getWarzoneConfig().getBoolean(WarzoneConfig.ENTRYALLOW)) {
+		} else if (locZone != null && locZone.getLobby() != null && !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker && !locZone.getWarzoneConfig().getBoolean(WarzoneConfig.ENTRYALLOW)) {
 			// player is not in any team, but inside a warzone he's not supposed to enter, get him out
 			Warzone zone = Warzone.getZoneByLocation(playerLoc);
 			event.setTo(zone.getTeleport());

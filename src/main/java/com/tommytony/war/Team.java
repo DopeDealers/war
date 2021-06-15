@@ -1,13 +1,21 @@
 package com.tommytony.war;
 
-import com.tommytony.war.config.*;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.Volume;
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.logging.Level;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -15,11 +23,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
 
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
+import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamConfigBag;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.TeamSpawnStyle;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.volume.Volume;
 
 /**
  *
@@ -376,6 +388,16 @@ public class Team {
 			player.setScoreboard(this.warzone.getScoreboard());
 		}
 		warzone.updateScoreboard();
+		
+		if(warzone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLECOOLDOWN)) {
+			player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024.0);
+		} else {
+			player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
+		}
+		
+		if(warzone.getWarzoneConfig().getBoolean(WarzoneConfig.RAPIDDAMAGE)) {
+			player.setMaximumNoDamageTicks(0);
+		}
 	}
 
 	public List<Player> getPlayers() {
@@ -423,19 +445,21 @@ public class Team {
 		this.name = name;
 	}
 
-	public void removePlayer(Player thePlayer) {
-		this.players.remove(thePlayer);
+	public void removePlayer(Player player) {
+		this.players.remove(player);
 		synchronized (teamChatPlayers) {
-			this.teamChatPlayers.remove(thePlayer);
+			this.teamChatPlayers.remove(player);
 		}
-		this.warzone.dropAllStolenObjects(thePlayer, false);
-		thePlayer.setFireTicks(0);
-		thePlayer.setRemainingAir(300);
-		if (!this.warzone.getReallyDeadFighters().contains(thePlayer.getName())) {
-			this.warzone.restorePlayerState(thePlayer);
+		this.warzone.dropAllStolenObjects(player, false);
+		player.setFireTicks(0);
+		player.setRemainingAir(300);
+		if (!this.warzone.getReallyDeadFighters().contains(player.getName())) {
+			this.warzone.restorePlayerState(player);
 		}
-		this.warzone.getLoadoutSelections().remove(thePlayer);
+		this.warzone.getLoadoutSelections().remove(player);
 		warzone.updateScoreboard();
+		player.setMaximumNoDamageTicks(20);
+		player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
 	}
 
 	public int getRemainingLives() {
