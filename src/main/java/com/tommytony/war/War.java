@@ -269,6 +269,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.CPRADIUS, 3);
 		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);
 		warzoneDefaultConfig.put(WarzoneConfig.DISABLECOOLDOWN, false);
+		warzoneDefaultConfig.put(WarzoneConfig.SWORDBLOCKING, false);
 		warzoneDefaultConfig.put(WarzoneConfig.RAPIDDAMAGE, true);
 		warzoneDefaultConfig.put(WarzoneConfig.GAMEMODE, "SURVIVAL");
 

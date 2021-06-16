@@ -52,6 +52,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.tommytony.war.Team;
@@ -218,8 +219,15 @@ public class WarPlayerListener implements Listener {
 			rate = 2;
 		}
 		
+		ItemStack invArrow = new ItemStack(Material.ARROW, 1);
 		if(!wpn.getRapid() && !wpn.getBullet().contains("ARROW")) {
-			player.getInventory().setItem(17, new ItemStack(Material.ARROW, 1));
+			ItemMeta meta = invArrow.getItemMeta();
+			List<String> lore = new ArrayList<String>();
+			lore.add("War-Arrow");
+			meta.setLore(lore);
+			invArrow.setItemMeta(meta);
+			
+			player.getInventory().setItem(17, invArrow);
 		}
 		
 		if(player.getWalkSpeed() < 0) { //Reset Scope
@@ -265,11 +273,14 @@ public class WarPlayerListener implements Listener {
 		int slt = slot;
 		Weapon wepn = wpn;
 		final boolean offH = offHand;
+		final ItemStack invArr = invArrow;
 		Bukkit.getScheduler().runTaskLater(War.war, new Runnable() {
 			@Override
 			public void run() {
 				gunWait.remove(player);
-				player.getInventory().remove(new ItemStack(Material.ARROW, 1));
+				if(invArr.getItemMeta().getLore().contains("War-Arrow")) { //Check if we needed a War-Arrow - then remove it
+					player.getInventory().remove(invArr);
+				}
 				if(Warzone.getZoneByLocation(event.getPlayer()) != null && wepn.getRapid()) {
 					if(offH) { //Yay OffHand
 						player.getInventory().setItemInOffHand(newIt);
@@ -1162,6 +1173,47 @@ public class WarPlayerListener implements Listener {
 				} else {
 					War.war.badMsg(event.getPlayer(), "zone.loadout.reenter");
 				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerBlock(PlayerInteractEvent event) {
+		Warzone zone = Warzone.getZoneByLocation(event.getPlayer());
+		if(zone == null) {
+			return;
+		}
+		if(!zone.getWarzoneConfig().getBoolean(WarzoneConfig.SWORDBLOCKING)) {
+			return;
+		}
+		Player player = event.getPlayer();
+		if(!player.getInventory().getItemInOffHand().getType().name().contains("AIR") || !player.getInventory().getItemInMainHand().getType().name().contains("SWORD")) {
+			return;
+		}
+		
+		ItemStack shield = new ItemStack(Material.SHIELD, 1);
+		ItemMeta meta = shield.getItemMeta();
+		List<String> lore = new ArrayList<String>();
+		lore.add("War-Shield");
+		meta.setLore(lore);
+		shield.setItemMeta(meta);
+		player.getInventory().setItemInOffHand(shield);
+	}
+	
+	@EventHandler
+	public void RemoveShieldEvent(PlayerItemHeldEvent event) {
+		Warzone zone = Warzone.getZoneByLocation(event.getPlayer());
+		if(zone == null) {
+			return;
+		}
+		if(!zone.getWarzoneConfig().getBoolean(WarzoneConfig.SWORDBLOCKING)) {
+			return;
+		}
+		Player player = event.getPlayer();
+		ItemStack item = player.getInventory().getItemInOffHand();
+		if(item != null && item.getType().name().contains("SHIELD")) {
+			if(item.getItemMeta().getLore().contains("War-Shield")) {
+				player.getInventory().setItemInOffHand(null);
 			}
 		}
 	}

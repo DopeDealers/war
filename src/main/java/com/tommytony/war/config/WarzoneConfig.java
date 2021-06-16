@@ -34,6 +34,7 @@ public enum WarzoneConfig {
 	CPRADIUS (Integer.class, "CapturePoint-Radius", "Defines the Capture-Point-Radius"),
 	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point"),
 	DISABLECOOLDOWN (Boolean.class, "Disable combat cooldown", "Disables the attack cooldown when swinging a weapon"),
+	SWORDBLOCKING (Boolean.class, "Enable 1.8-like Blocking", "If true, players can block with just a sword"),
 	RAPIDDAMAGE (Boolean.class, "Allow rapid damage", "Allows for rapid damage to the players (e.g. machine guns)"),
 	PREPTIME(Integer.class, "Preparation Time", "Time, in seconds, before players are allowed to fight");
 	
