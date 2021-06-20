@@ -1,14 +1,14 @@
 package com.tommytony.war.command;
 
-import com.tommytony.war.War;
-import com.tommytony.war.ui.WarUI;
-import org.bukkit.Bukkit;
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.logging.Level;
+import com.tommytony.war.War;
+import com.tommytony.war.ui.WarUI;
 
 
 /**
@@ -126,6 +126,8 @@ public class WarCommandHandler {
 				commandObj = new UnloadWarCommand(this, sender, arguments);
 			} else if (command.equals("reloadwar")) {
 				commandObj = new ReloadWarCommand(this, sender, arguments);
+			} else if (command.equals("warversion")) {
+				commandObj = new WarVersionCommand(this, sender, arguments);
 			} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {

@@ -280,6 +280,9 @@ commands:
   reloadwar:
     description: Reloads the War plugin.
     usage: /<command>
+  warversion:
+    description: Prints the running version.
+    usage: /<command>
   warcfg:
     description: |
       Change War global settings.
