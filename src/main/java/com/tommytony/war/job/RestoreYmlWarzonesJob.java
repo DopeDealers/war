@@ -1,18 +1,22 @@
 package com.tommytony.war.job;
 
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.mapper.WarzoneYmlMapper;
-import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
+
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.DrilldownPie;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.SingleLineChart;
+import org.bukkit.Bukkit;
+
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.mapper.WarzoneYmlMapper;
 
 public class RestoreYmlWarzonesJob implements Runnable {
 
@@ -51,16 +55,17 @@ public class RestoreYmlWarzonesJob implements Runnable {
 				War.war.log("Warzones ready.", Level.INFO);
 			}
 		}
-		Metrics metrics = new Metrics(War.war);
-		metrics.addCustomChart(new Metrics.SimplePie("language", () -> {
+		int pluginId = 3666;
+		Metrics metrics = new Metrics(War.war, pluginId);
+		metrics.addCustomChart(new SimplePie("language", () -> {
 			String lang = War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH);
 			if (lang == null || lang.isEmpty()) {
 				lang = "English";
 			}
 			return lang;
 		}));
-		metrics.addCustomChart(new Metrics.SingleLineChart("warzones", War.war.getWarzones()::size));
-		metrics.addCustomChart(new Metrics.DrilldownPie("extensions", () -> {
+		metrics.addCustomChart(new SingleLineChart("warzones", War.war.getWarzones()::size));
+		metrics.addCustomChart(new DrilldownPie("extensions", () -> {
 			Map<String, Map<String, Integer>> map = new HashMap<>();
 			getExtensionEntry("WorldEdit", map);
 			getExtensionEntry("Vault", map);
