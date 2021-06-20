@@ -20,11 +20,11 @@ Features
 
 Downloads
 ---------
-You can find the newest release at github.com/Jakllp/war/releases/tag/latest.
+You can find the newest release at (github.com/Jakllp/war/releases/tag/latest).
 
 Older/Pre Releases
 ----------
-All releases, including pre-releases are available at github.com/Jakllp/war/releases/.
+All releases, including pre-releases are available at (github.com/Jakllp/war/releases/).
 
 Original-Author
 ------
