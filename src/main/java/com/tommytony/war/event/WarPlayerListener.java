@@ -14,14 +14,13 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Event.Result;
@@ -69,6 +68,7 @@ import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.InteractiveBlocks;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.MetadataValue;
@@ -139,8 +139,13 @@ public class WarPlayerListener implements Listener {
 		if(!isWeapon) {
 			return;
 		}
-		
 
+		Block block = event.getClickedBlock();
+		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && block != null &&
+        		InteractiveBlocks.getList().contains(block.getType())) {
+            return;
+		}
+		
 		Player player = event.getPlayer();
 
 		if(event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
@@ -278,7 +283,7 @@ public class WarPlayerListener implements Listener {
 			@Override
 			public void run() {
 				gunWait.remove(player);
-				if(invArr.getItemMeta().getLore().contains("War-Arrow")) { //Check if we needed a War-Arrow - then remove it
+				if(invArr.getItemMeta().getLore() != null && invArr.getItemMeta().getLore().contains("War-Arrow")) { //Check if we needed a War-Arrow - then remove it
 					player.getInventory().remove(invArr);
 				}
 				if(Warzone.getZoneByLocation(event.getPlayer()) != null && wepn.getRapid()) {
@@ -563,13 +568,6 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			if(event.getItem() != null && event.getItem().getItemMeta() != null && Weapon.getWeaponByString(event.getItem().getItemMeta().getDisplayName()) != null) {
-				if(Warzone.getZoneByLocation(event.getPlayer()) != null) {
-					event.setCancelled(true);
-				}
-				return;
-			}
-
 			if (event.getItem() != null && event.getItem().getType() == Material.WOODEN_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);
