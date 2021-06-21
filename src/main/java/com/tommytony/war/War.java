@@ -53,6 +53,7 @@ import com.tommytony.war.config.WarConfigBag;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.config.WeaponBag;
+import com.tommytony.war.event.SwordBlockingListener;
 import com.tommytony.war.event.WarBlockListener;
 import com.tommytony.war.event.WarEntityListener;
 import com.tommytony.war.event.WarPlayerListener;
@@ -104,6 +105,7 @@ public class War extends JavaPlugin {
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	// general
 	private WarPlayerListener playerListener = new WarPlayerListener();
+	private SwordBlockingListener swordListener = new SwordBlockingListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
 	private WarCommandHandler commandHandler = new WarCommandHandler();
@@ -218,6 +220,7 @@ public class War extends JavaPlugin {
 		// Register events
 		PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvents(this.playerListener, this);
+		pm.registerEvents(this.swordListener, this);
 		pm.registerEvents(this.entityListener, this);
 		pm.registerEvents(this.blockListener, this);
 		pm.registerEvents(this.UIManager, this);

@@ -1175,48 +1175,7 @@ public class WarPlayerListener implements Listener {
 				}
 			}
 		}
-	}
-	
-	@EventHandler
-	public void onPlayerBlock(PlayerInteractEvent event) {
-		Warzone zone = Warzone.getZoneByLocation(event.getPlayer());
-		if(zone == null) {
-			return;
-		}
-		if(!zone.getWarzoneConfig().getBoolean(WarzoneConfig.SWORDBLOCKING)) {
-			return;
-		}
-		Player player = event.getPlayer();
-		if(!player.getInventory().getItemInOffHand().getType().name().contains("AIR") || !player.getInventory().getItemInMainHand().getType().name().contains("SWORD")) {
-			return;
-		}
-		
-		ItemStack shield = new ItemStack(Material.SHIELD, 1);
-		ItemMeta meta = shield.getItemMeta();
-		List<String> lore = new ArrayList<String>();
-		lore.add("War-Shield");
-		meta.setLore(lore);
-		shield.setItemMeta(meta);
-		player.getInventory().setItemInOffHand(shield);
-	}
-	
-	@EventHandler
-	public void RemoveShieldEvent(PlayerItemHeldEvent event) {
-		Warzone zone = Warzone.getZoneByLocation(event.getPlayer());
-		if(zone == null) {
-			return;
-		}
-		if(!zone.getWarzoneConfig().getBoolean(WarzoneConfig.SWORDBLOCKING)) {
-			return;
-		}
-		Player player = event.getPlayer();
-		ItemStack item = player.getInventory().getItemInOffHand();
-		if(item != null && item.getType().name().contains("SHIELD")) {
-			if(item.getItemMeta().getLore().contains("War-Shield")) {
-				player.getInventory().setItemInOffHand(null);
-			}
-		}
-	}
+	}		
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
