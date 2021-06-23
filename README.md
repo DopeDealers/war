@@ -20,13 +20,13 @@ Features
 
 Downloads
 ---------
-You can find the newest release at github.com/Jakllp/war/releases/tag/latest.
+You can find the newest release at https://github.com/Jakllp/war/releases/tag/latest.
 
 Older/Pre Releases
 ----------
-All releases, including pre-releases are available at github.com/Jakllp/war/releases/.
+All releases, including pre-releases are available at https://github.com/Jakllp/war/releases/.
 
-Original Author
+Original-Author
 ------
 tommytony started the plugin in December 2010 on hMod and has been maintaining it since with the help of contributors.
 Reach him at taoneill@tommytony.com.
