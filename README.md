@@ -17,6 +17,7 @@ Features
 - Other game types: capture points and explosive-based objectives
 - Up to 16 teams!
 - Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))
+- 1.8 PvP - See [Warzone-Config](https://github.com/Jakllp/war/wiki/Warzone-Config) - Thanks [OldCombatMechanics](https://www.spigotmc.org/resources/oldcombatmechanics-disable-1-9-hit-cooldown.19510/) for being OpenSource!
 
 Downloads
 ---------
