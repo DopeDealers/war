@@ -32,6 +32,7 @@ public enum WarzoneConfig {
 	ONLYRESETCHESTS (Boolean.class, "Reset Blocks", "If true, only chests will be reset"),
 	ENEMYNAMES (Boolean.class, "Seeing Enemy Names", "If true, players can see enemy names"),
 	CPRADIUS (Integer.class, "CapturePoint-Radius", "Defines the Capture-Point-Radius"),
+	CPSTYLE (CPStyle.class, "CapturePoint-Radius", "Defines the Capture-Point-Style"),
 	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point"),
 	DISABLECOOLDOWN (Boolean.class, "Disable combat cooldown", "Disables the attack cooldown when swinging a weapon"),
 	SWORDBLOCKING (Boolean.class, "Enable 1.8-like Blocking", "If true, players can block with just a sword"),

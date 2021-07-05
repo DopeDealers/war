@@ -3,7 +3,6 @@ package com.tommytony.war.structure;
 import java.util.Collection;
 
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -12,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.CPStyle;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.volume.Volume;
@@ -24,9 +24,6 @@ import net.md_5.bungee.api.ChatColor;
  * @author Connor Monahan
  */
 public class CapturePoint {
-	private static int[][][] structure = {
-	};
-
 	private final String name;
 	private Volume volume;
 	private Location location;
@@ -50,70 +47,82 @@ public class CapturePoint {
 	}
 
 	private void updateBlocks() {
+		CPStyle style = warzone.getWarzoneConfig().getCPStyle(WarzoneConfig.CPSTYLE);
 		Validate.notNull(location);
 		// Set origin to middle
 		Location origin = this.getOrigin();
-		// Build structure - not necessary rn
-		/*for (int y = 0; y < structure.length; y++) {
-			for (int z = 0; z < structure[0].length; z++) {
-				for (int x = 0; x < structure[0][0].length; x++) {
-					BlockState state = origin.clone().add(x, y, z).getBlock().getState();
-					switch (structure[y][z][x]) {
-						case 0:
-							state.setType(Material.AIR);
-							break;
-						default:
-							throw new IllegalStateException("Invalid structure");
-					}
+		
+		if(style == CPStyle.ANALOG || style == CPStyle.BOTH) {
+			// Build structure
+			for (int y = 0; y < 5; y++) {
+				BlockState state = origin.clone().add(0, y, 0).getBlock().getState();
+				state.setType(Material.WHITE_STAINED_GLASS);
+				state.update(true);
+			}
+			
+			// Show progress
+			if (strength > 0 && controller != null) {
+				int step = (int) (strength / (getMaxStrength() / 4.0));
+				while(step >= 0) {
+					double y = 4-step;
+					BlockState state = origin.clone().add(0,y,0).getBlock().getState();
+					state.setType(controller.getGlass());
 					state.update(true);
+					step--;
 				}
 			}
-		} */
-		
-		ArmorStand stand = null;
-		
-		Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 1, 3, 1);
-		for(Entity en : entities) {
-			if(en.getType().name().toUpperCase().equals("ARMOR_STAND")) {
-				stand = (ArmorStand) en;
-			}
-		}
-				
-		if(stand == null) {
-			stand = (ArmorStand) origin.getWorld().spawnEntity(origin.clone().add(0.5, 2, 0.5), EntityType.ARMOR_STAND);
-			stand.setPersistent(true);
-			stand.setGravity(false);
-			stand.setInvulnerable(true);
-			stand.setCustomNameVisible(true);
-			stand.setVisible(false);
-			stand.setMarker(true);
-		}
-		
-		// Add flag block
-		if (strength > 0 && controller != null) {
-			int step = (int) (strength / (getMaxStrength() / 4.0));
 			
-			switch(step) {
-				case 4:
-					stand.setCustomName(controller.getColor()+ "100% ||||||||||||||||||||||||||||||||||||||||");
-					break;
-				case 3:
-					stand.setCustomName(controller.getColor()+ "80% ||||||||||||||||||||||||||||||||" + ChatColor.WHITE + ("||||||||"));
-					break;
-				case 2:
-					stand.setCustomName(controller.getColor()+ "60% ||||||||||||||||||||||||" + ChatColor.WHITE + ("||||||||||||||||"));
-					break;
-				case 1:
-					stand.setCustomName(controller.getColor()+ "40% ||||||||||||||||" + ChatColor.WHITE + ("||||||||||||||||||||||||"));
-					break;
-				case 0:
-					stand.setCustomName(controller.getColor()+ "20% ||||||||" + ChatColor.WHITE + ("||||||||||||||||||||||||||||||||"));
-					break;
-				default:
-					break;
+			if(style == CPStyle.ANALOG) {
+				removeArmorstand();
 			}
-		} else {
-			stand.setCustomName(ChatColor.stripColor("0% ||||||||||||||||||||||||||||||||||||||||"));
+		}
+
+			
+		if(style == CPStyle.DIGITAL || style == CPStyle.BOTH) {		//Digital-CapturePoint
+			ArmorStand stand = null;
+			
+			Collection<Entity> entities = origin.getWorld().getNearbyEntities(origin, 1, 3, 1);
+			for(Entity en : entities) {
+				if(en.getType().name().toUpperCase().equals("ARMOR_STAND")) {
+					stand = (ArmorStand) en;
+				}
+			}	
+			if(stand == null) {
+				stand = (ArmorStand) origin.getWorld().spawnEntity(origin.clone().add(0.5, 2, 0.5), EntityType.ARMOR_STAND);
+				stand.setPersistent(true);
+				stand.setGravity(false);
+				stand.setInvulnerable(true);
+				stand.setCustomNameVisible(true);
+				stand.setVisible(false);
+				stand.setMarker(true);
+			}
+			
+			// Show progress
+			if (strength > 0 && controller != null) {
+				int step = (int) (strength / (getMaxStrength() / 4.0));
+				
+				switch(step) {
+					case 4:
+						stand.setCustomName(controller.getColor()+ "100% ||||||||||||||||||||||||||||||||||||||||");
+						break;
+					case 3:
+						stand.setCustomName(controller.getColor()+ "80% ||||||||||||||||||||||||||||||||" + ChatColor.WHITE + ("||||||||"));
+						break;
+					case 2:
+						stand.setCustomName(controller.getColor()+ "60% ||||||||||||||||||||||||" + ChatColor.WHITE + ("||||||||||||||||"));
+						break;
+					case 1:
+						stand.setCustomName(controller.getColor()+ "40% ||||||||||||||||" + ChatColor.WHITE + ("||||||||||||||||||||||||"));
+						break;
+					case 0:
+						stand.setCustomName(controller.getColor()+ "20% ||||||||" + ChatColor.WHITE + ("||||||||||||||||||||||||||||||||"));
+						break;
+					default:
+						break;
+				}
+			} else {
+				stand.setCustomName(ChatColor.stripColor("0% ||||||||||||||||||||||||||||||||||||||||"));
+			}
 		}
 	}
 	

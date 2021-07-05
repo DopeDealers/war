@@ -102,6 +102,15 @@ public class WarzoneConfigBag {
 			return War.war.getWarzoneDefaultConfig().getScoreboardType(config);
 		}
 	}
+	
+	public CPStyle getCPStyle(WarzoneConfig config) {
+		if (bag.containsKey(config)) {
+			return (CPStyle)bag.get(config);
+		} else {
+			// use War default config
+			return War.war.getWarzoneDefaultConfig().getCPStyle(config);
+		}
+	}
 
 	public boolean contains(WarzoneConfig config) {
 		return this.bag.containsKey(config);
@@ -163,6 +172,9 @@ public class WarzoneConfigBag {
 				} else if (warzoneConfig.getConfigType().equals(ScoreboardType.class)) {
 					String type = namedParams.get(namedParam);
 					this.bag.put(warzoneConfig, ScoreboardType.getFromString(type));
+				} else if (warzoneConfig.getConfigType().equals(CPStyle.class)) {
+					String type = namedParams.get(namedParam);
+					this.bag.put(warzoneConfig, CPStyle.getFromString(type));
 				} 
 				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam);
 			} else if (namedParam.equals("delete")) {

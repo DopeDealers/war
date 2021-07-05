@@ -39,6 +39,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.tommytony.war.command.WarCommandHandler;
+import com.tommytony.war.config.CPStyle;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.KillstreakReward;
@@ -157,6 +158,7 @@ public class War extends JavaPlugin {
 			OutputStream output = new FileOutputStream(langFile);
 			output.write(buffer);
 			//newC.save(configFile);
+			output.close();
 		}
 		
 		//Create Reference-File
@@ -171,6 +173,7 @@ public class War extends JavaPlugin {
 			
 			OutputStream output2 = new FileOutputStream(referenceFile);
 			output2.write(buffer2);
+			output2.close();
 		}
 			
 		FileInputStream fis = new FileInputStream(langFile.getAbsolutePath());
@@ -270,6 +273,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.ENEMYNAMES, true);
 		warzoneDefaultConfig.put(WarzoneConfig.CAPTUREPOINTTIME, 15);
 		warzoneDefaultConfig.put(WarzoneConfig.CPRADIUS, 3);
+		warzoneDefaultConfig.put(WarzoneConfig.CPSTYLE, CPStyle.DIGITAL);
 		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);
 		warzoneDefaultConfig.put(WarzoneConfig.DISABLECOOLDOWN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SWORDBLOCKING, false);
@@ -1007,7 +1011,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void msg(CommandSender sender, String str) {
-		if (messages.containsKey(str)) str = this.getString(str);
+		if (inMessages(str)) str = this.getString(str);
 		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
@@ -1020,7 +1024,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void badMsg(CommandSender sender, String str) {
-		if (messages.containsKey(str)) str = this.getString(str);
+		if (inMessages(str)) str = this.getString(str);
 		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
@@ -1033,7 +1037,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void msg(CommandSender sender, String str, Object... obj) {
-		if (messages.containsKey(str)) str = this.getString(str);
+		if (inMessages(str)) str = this.getString(str);
 		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
@@ -1049,7 +1053,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void badMsg(CommandSender sender, String str, Object... obj) {
-		if (messages.containsKey(str)) str = this.getString(str);
+		if (inMessages(str)) str = this.getString(str);
 		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
@@ -1374,7 +1378,12 @@ public class War extends JavaPlugin {
 		} catch(MissingResourceException e) {
 			return messagesFallBack.getString(key);
 		}
-		
+	}
+	
+	public boolean inMessages(String key) {
+		if (!messages.containsKey(key) && !messagesFallBack.containsKey(key))
+			return false;
+		return true;
 	}
 
 	public Locale getLoadedLocale() {

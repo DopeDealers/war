@@ -127,9 +127,11 @@ public class SwordBlockingListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onItemSwitch(PlayerItemHeldEvent e) {
     	Player p = e.getPlayer();
-    	UUID id = p.getUniqueId();
-    	p.getInventory().setItemInOffHand(storedOffhandItems.get(id));
-        storedOffhandItems.remove(id);
+    	if(hasShield(p)) {
+        	UUID id = p.getUniqueId();
+        	p.getInventory().setItemInOffHand(storedOffhandItems.get(id));
+            storedOffhandItems.remove(id);
+    	}
 	}
 
     @EventHandler(priority = EventPriority.HIGHEST)
