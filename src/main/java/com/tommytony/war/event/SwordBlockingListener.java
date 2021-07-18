@@ -1,6 +1,8 @@
 package com.tommytony.war.event;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +26,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.tommytony.war.War;
@@ -71,13 +74,19 @@ public class SwordBlockingListener implements Listener {
         if(!p.isBlocking()){
             ItemStack item = e.getItem();
 
-            if(!isHoldingSword(item.getType()) || hasShield(p)) return;
+            if(!isHoldingSword(item.getType()) || hasNormShield(p)) return;
 
             PlayerInventory inv = p.getInventory();
 
             storedOffhandItems.put(id, inv.getItemInOffHand());
-
-            inv.setItemInOffHand(SHIELD);
+            
+            ItemStack shield = SHIELD.clone();
+            ItemMeta meta = shield.getItemMeta();
+            List<String> lore = new ArrayList<String>();
+			lore.add("War-Shield");
+			meta.setLore(lore);
+			shield.setItemMeta(meta);
+            inv.setItemInOffHand(shield);
         }
 
         scheduleRestore(p);
@@ -218,9 +227,14 @@ public class SwordBlockingListener implements Listener {
     }
 
     private boolean hasShield(Player p){
+    	ItemStack item = p.getInventory().getItemInOffHand();
+        return item.getType() == Material.SHIELD && item.getItemMeta().getLore() != null && item.getItemMeta().getLore().contains("War-Shield");
+    }
+    
+    private boolean hasNormShield(Player p){
         return p.getInventory().getItemInOffHand().getType() == Material.SHIELD;
     }
-
+    
     private boolean isHoldingSword(Material mat){
         return mat.toString().endsWith("_SWORD");
     }
