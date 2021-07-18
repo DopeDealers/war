@@ -621,10 +621,6 @@ public class Warzone {
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		playerInv.clear();
-		playerInv.clear(playerInv.getSize());
-		playerInv.clear(playerInv.getSize() + 1);
-		playerInv.clear(playerInv.getSize() + 2);
-		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
 
 		Loadout banned = Loadout.getLoadout(team.getInventories().resolveNewLoadouts(), "banned");
 		Set<Material> bannedMaterials = new HashSet<Material>();
@@ -651,7 +647,7 @@ public class Warzone {
 			} else if (slot == 103) {
 				playerInv.setHelmet(item.clone());
 			} else {
-				playerInv.addItem(item.clone());
+				playerInv.setItem(slot, item.clone());
 			}
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {

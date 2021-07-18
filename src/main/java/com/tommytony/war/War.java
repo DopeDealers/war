@@ -277,7 +277,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);
 		warzoneDefaultConfig.put(WarzoneConfig.DISABLECOOLDOWN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SWORDBLOCKING, false);
-		warzoneDefaultConfig.put(WarzoneConfig.RAPIDDAMAGE, true);
+		warzoneDefaultConfig.put(WarzoneConfig.RAPIDDAMAGE, false);
 		warzoneDefaultConfig.put(WarzoneConfig.GAMEMODE, "SURVIVAL");
 
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
@@ -439,14 +439,14 @@ public class War extends JavaPlugin {
 	 * @param loadout
 	 *                the hashmap to save to
 	 */
-	private void inventoryToLoadout(PlayerInventory inv, HashMap<Integer, ItemStack> loadout) {
+	private void inventoryToLoadout(PlayerInventory inv, HashMap<Integer, ItemStack> loadout) { //MARK Loadout Shit
 		loadout.clear();
 		int i = 0;
 		for (ItemStack stack : inv.getStorageContents()) {
 			if (stack != null && stack.getType() != Material.AIR) {
 				loadout.put(i, stack.clone());
-				i++;
 			}
+			i++;
 		}
 		if (inv.getBoots() != null && inv.getBoots().getType() != Material.AIR) {
 			loadout.put(100, inv.getBoots().clone());
@@ -459,6 +459,9 @@ public class War extends JavaPlugin {
 		}
 		if (inv.getHelmet() != null && inv.getHelmet().getType() != Material.AIR) {
 			loadout.put(103, inv.getHelmet().clone());
+		}
+		if (inv.getItemInOffHand() != null && inv.getItemInOffHand().getType() != Material.AIR) {
+			loadout.put(40, inv.getItemInOffHand().clone());
 		}
 	}
 
