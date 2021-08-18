@@ -107,7 +107,7 @@
     </dependency>
     <dependency>
         <groupId>com.github.NEZNAMY</groupId>
-        <artifactId>TAB-API</artifactId>
+        <artifactId>TAB</artifactId>
         <version>LATEST</version>
       </dependency>
     <dependency>
@@ -118,8 +118,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.9.5</version>
+      <artifactId>mockito-core</artifactId>
+      <version>3.11.2</version>
       <type>jar</type>
       <scope>test</scope>
     </dependency>
