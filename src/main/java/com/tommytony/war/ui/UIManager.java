@@ -62,7 +62,9 @@ public class UIManager implements Listener {
 				if (ui.processClick(clicked, inventory)) {
 					event.setCancelled(true);
 					player.closeInventory();
-					uiMap.remove(player);
+					uiMap.remove(player);	
+				} else {
+					event.setCancelled(true);
 				}
 			} else {
 				uiMap.remove(player);

@@ -14,28 +14,36 @@ public class DefaultZoneConfigUI extends ChestUI {
         ItemStack item;
         ItemMeta meta;
         int i = 0;
-
-        item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
-        meta = item.getItemMeta();
-        meta.setDisplayName(">>>> Warzone Default Config >>>>");
-        item.setItemMeta(meta);
-        this.addItem(inv, i++, item, () -> War.war.getUIManager().assignUI(player, new WarAdminUI()));
-        i = UIConfigHelper.addWarzoneConfigOptions(this, player, inv, War.war.getWarzoneDefaultConfig(), null, i);
-        item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
-        meta = item.getItemMeta();
-        meta.setDisplayName(">>>> Team Default Config >>>>");
-        item.setItemMeta(meta);
-        this.addItem(inv, i++, item, () -> War.war.getUIManager().assignUI(player, new WarAdminUI()));
-        UIConfigHelper.addTeamConfigOptions(this, player, inv, War.war.getTeamDefaultConfig(), null, null, i);
+        
+		item = new ItemStack(Material.CHEST);
+		meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.YELLOW + "Default War Config");
+		item.setItemMeta(meta);
+		this.addItem(inv, 0, item, new Runnable() {
+			@Override
+			public void run() {
+				War.war.getUIManager().assignUI(player, new EditDefaultWarConfigUI());
+			}
+		});
+		item = new ItemStack(Material.CHEST);
+		meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.YELLOW + "Default Team Config");
+		item.setItemMeta(meta);
+		this.addItem(inv, 1, item, new Runnable() {
+			@Override
+			public void run() {
+				War.war.getUIManager().assignUI(player, new EditDefaultTeamConfigUI());
+			}
+		});
     }
 
     @Override
     public String getTitle() {
-        return ChatColor.DARK_RED + "" + ChatColor.BOLD + "War Default Zone Config";
+        return ChatColor.DARK_RED + "" + ChatColor.BOLD + "Default Configs";
     }
 
     @Override
     public int getSize() {
-        return 9*6;
+        return 9;
     }
 }
