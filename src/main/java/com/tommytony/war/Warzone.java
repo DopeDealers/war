@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.TabPlayer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -89,9 +91,8 @@ import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
-import me.neznamy.tab.api.TABAPI;
-import me.neznamy.tab.api.TabPlayer;
 import net.milkbowl.vault.economy.EconomyResponse;
+import sun.tools.jconsole.Tab;
 
 /**
  *
@@ -1125,14 +1126,14 @@ public class Warzone {
 		this.keepPlayerState(player); //MARK - Absturz-Inventar?
 
 		if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
-			TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
+			TabPlayer tplayer = TabAPI.getInstance().getPlayer(player.getUniqueId());
 
 			for(Team t : this.teams) {
 				if(t != team) {
 					for(Player p : t.getPlayers()) {
-						TabPlayer tp = TABAPI.getPlayer(p.getUniqueId());
-						tp.hideNametag(player.getUniqueId());
-						tplayer.hideNametag(p.getUniqueId());
+						TabPlayer tp = TabAPI.getInstance().getPlayer(p.getUniqueId());
+						TabAPI.getInstance().getTeamManager().hideNametag(tp, tplayer);
+						TabAPI.getInstance().getTeamManager().hideNametag(tplayer, tp);
 					}
 				}
 			}
@@ -1434,13 +1435,13 @@ public class Warzone {
 	
 	private void showNametags(Player player, Team playerTeam) {
 		if(War.war.getTAB() && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ENEMYNAMES)) {
-			TabPlayer tplayer = TABAPI.getPlayer(player.getUniqueId());
+			TabPlayer tplayer = TabAPI.getInstance().getPlayer(player.getUniqueId());
 			for(Team t : this.teams) {
 				if(t != playerTeam) {
 					for(Player p : t.getPlayers()) {
-						TabPlayer tp = TABAPI.getPlayer(p.getUniqueId());
-						tp.showNametag(player.getUniqueId());
-						tplayer.showNametag(p.getUniqueId());
+						TabPlayer tp = TabAPI.getInstance().getPlayer(p.getUniqueId());
+						TabAPI.getInstance().getTeamManager().showNametag(tp, tplayer);
+						TabAPI.getInstance().getTeamManager().showNametag(tplayer, tp);
 					}
 				}
 			}
