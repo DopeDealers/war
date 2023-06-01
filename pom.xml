@@ -21,12 +21,16 @@
         <url>https://jitpack.io</url>
       </repository>
     <repository>
+      <id>enginehub-maven</id>
+      <url>https://maven.enginehub.org/repo/</url>
+    </repository>
+    <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository>
     <repository>
       <id>sk89q-repo</id>
-      <url>https://maven.sk89q.com/repo/</url>
+      <url>https://maven.enginehub.org/repo/</url>
     </repository>
     <repository>
       <id>krypton</id>
@@ -110,14 +114,30 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
         <groupId>me.neznamy</groupId>
         <artifactId>tab-api</artifactId>
         <version>3.0.1</version>
       </dependency>
     <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.19.0</version> <!-- replace with the version you are targeting -->
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q.worldedit</groupId>
+      <artifactId>worldedit-bukkit</artifactId>
+      <version>7.2.14</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.16.1-R0.1-SNAPSHOT</version>
+      <version>1.19.4-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -126,12 +146,6 @@
       <version>4.1.0</version>
       <type>jar</type>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.tommytony</groupId>
-      <artifactId>worldedit-bukkit</artifactId>
-      <version>LATEST</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
