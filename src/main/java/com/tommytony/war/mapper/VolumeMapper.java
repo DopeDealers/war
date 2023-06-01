@@ -7,6 +7,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
@@ -51,9 +52,9 @@ public class VolumeMapper {
 	 * Loads the given volume
 	 *
 	 * @param databaseConnection Open connection to zone database
-	 * @param volume Volume to load
-	 * @param start Starting position to load blocks at
-	 * @param total Amount of blocks to read
+	 * @param volume             Volume to load
+	 * @param start              Starting position to load blocks at
+	 * @param total              Amount of blocks to read
 	 * @return Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
 	 */
@@ -66,14 +67,14 @@ public class VolumeMapper {
 		Statement stmt = databaseConnection.createStatement();
 		Map<Integer, String> stringCache = new HashMap<>();
 		stringCache.put(0, null);
-		ResultSet cacheQuery = stmt.executeQuery("SELECT * FROM "+ prefix +"strings");
+		ResultSet cacheQuery = stmt.executeQuery("SELECT * FROM " + prefix + "strings");
 		while (cacheQuery.next()) {
 			stringCache.put(cacheQuery.getInt("id"), cacheQuery.getString("type"));
 		}
 		cacheQuery.close();
 		int minX = volume.getMinX(), minY = volume.getMinY(), minZ = volume.getMinZ();
 		int changed = 0;
-		ResultSet query = stmt.executeQuery("SELECT * FROM "+ prefix + "blocks ORDER BY rowid LIMIT " + start + ", " + total);
+		ResultSet query = stmt.executeQuery("SELECT * FROM " + prefix + "blocks ORDER BY rowid LIMIT " + start + ", " + total);
 		while (query.next()) {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
 			changed++;
@@ -82,11 +83,11 @@ public class VolumeMapper {
 			if (changes != null) {
 				changes[xi][yi][zi] = true;
 			}
-			
-			if(chest && !relative.getType().name().toUpperCase().contains("CHEST")) {
+
+			if (chest && !relative.getType().name().toUpperCase().contains("CHEST")) {
 				continue;
 			}
-			
+
 			BlockState modify = relative.getState();
 			// Load information from database, or null if not set
 			String type = stringCache.get(query.getInt("type"));
@@ -94,11 +95,14 @@ public class VolumeMapper {
 			String metadata = stringCache.get(query.getInt("metadata"));
 
 			// Try to look up the material. May fail due to mods or MC updates.
-			Material mat = Material.getMaterial(type);
-			if (mat == null) {
+			Material mat = null;
+			try {
+				mat = Material.valueOf(type);
+			} catch (IllegalArgumentException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to parse block type. " + getBlockDescriptor(modify.getLocation(), type, data, metadata));
 				continue;
 			}
+
 			// Try to get the block data (damage, non-tile information) using the 1.13 functions
 			BlockData bdata = null;
 			try {
@@ -125,7 +129,7 @@ public class VolumeMapper {
 				relative = corner1.getRelative(x, y, z);
 				modify = relative.getState();
 			}
-			// Try to update the tile entity data
+	// Try to update the tile entity data
 			if (metadata != null) {
 				try {
 					if (modify instanceof Sign) {
@@ -135,43 +139,79 @@ public class VolumeMapper {
 						}
 					}
 
-					// Containers
+
+// Existing code...
 					if (modify instanceof Container) {
-						YamlConfiguration config = new YamlConfiguration();
-						config.loadFromString(metadata);
-						Inventory inv = ((Container) modify).getSnapshotInventory();
-						inv.clear();
-						int slot = 0;
-						for (Object obj : config.getList("items")) {
-							if (obj instanceof ItemStack) {
-								inv.setItem(slot, (ItemStack) obj);
+						YamlConfiguration yamlConfig = new YamlConfiguration();
+						try {
+							yamlConfig.loadFromString(metadata);
+						} catch (InvalidConfigurationException e) {
+							War.war.getLogger().log(Level.WARNING, "Invalid container metadata. " + getBlockDescriptor(modify.getLocation(), type, data, metadata), e);
+							continue;
+						}
+
+						List<?> itemsList = yamlConfig.getList("items");
+						if (itemsList != null) {
+							Inventory inv = ((Container) modify).getInventory();
+							inv.clear();
+							int slot = 0;
+							for (Object obj : itemsList) {
+								if (obj instanceof ItemStack) {
+									inv.setItem(slot, (ItemStack) obj);
+								}
+								++slot;
 							}
-							++slot;
 						}
 					}
 
 					// Records
 					if (modify instanceof Jukebox) {
-						((Jukebox) modify).setPlaying(Material.valueOf(metadata));
+						if (metadata != null && !metadata.equals("items: - null")) {
+							try {
+								Material material = Material.matchMaterial(metadata);
+								if (material != null) {
+									((Jukebox) modify).setRecord(new ItemStack(material));
+								} else {
+									War.war.getLogger().log(Level.WARNING, "Invalid record type: " + metadata);
+								}
+							} catch (Exception e) {
+								War.war.getLogger().log(Level.WARNING, "Error setting jukebox record: " + metadata, e);
+							}
+						}
 					}
+
+
 
 					// Skulls
 					if (modify instanceof Skull) {
-						UUID playerId = UUID.fromString(metadata);
-						OfflinePlayer player = Bukkit.getOfflinePlayer(playerId);
-						((Skull) modify).setOwningPlayer(player);
+						try {
+							UUID playerId = UUID.fromString(metadata);
+							OfflinePlayer player = Bukkit.getOfflinePlayer(playerId);
+							((Skull) modify).setOwningPlayer(player);
+						} catch (IllegalArgumentException e) {
+							War.war.getLogger().log(Level.WARNING, "Invalid player UUID. " + getBlockDescriptor(modify.getLocation(), type, data, metadata), e);
+						}
 					}
 
 					// Command blocks
 					if (modify instanceof CommandBlock) {
 						final String[] commandArray = metadata.split("\n");
-						((CommandBlock) modify).setName(commandArray[0]);
-						((CommandBlock) modify).setCommand(commandArray[1]);
+						if (commandArray.length >= 2) {
+							((CommandBlock) modify).setName(commandArray[0]);
+							((CommandBlock) modify).setCommand(commandArray[1]);
+						} else {
+							War.war.getLogger().log(Level.WARNING, "Invalid command block metadata. " + getBlockDescriptor(modify.getLocation(), type, data, metadata));
+						}
 					}
 
 					// Creature spawner
 					if (modify instanceof CreatureSpawner) {
-						((CreatureSpawner) modify).setSpawnedType(EntityType.valueOf(metadata));
+						try {
+							EntityType entityType = EntityType.valueOf(metadata);
+							((CreatureSpawner) modify).setSpawnedType(entityType);
+						} catch (IllegalArgumentException e) {
+							War.war.getLogger().log(Level.WARNING, "Invalid creature type. " + getBlockDescriptor(modify.getLocation(), type, data, metadata), e);
+						}
 					}
 
 					if (!inMemory) {
@@ -182,7 +222,7 @@ public class VolumeMapper {
 				}
 			}
 
-			if (inMemory) {
+				if (inMemory) {
 				volume.getBlocks().add(modify);
 			}
 		}
