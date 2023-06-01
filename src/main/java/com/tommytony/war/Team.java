@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 
+import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -57,7 +59,7 @@ public class Team {
 	public Team(String name, TeamKind kind, List<Location> teamSpawn, Warzone warzone) {
 		this.warzone = warzone;
 		this.teamConfig = new TeamConfigBag(warzone);
-		this.inventories = new InventoryBag(warzone);	// important constructors for cascading configs
+		this.inventories = new InventoryBag(warzone);    // important constructors for cascading configs
 		this.setName(name);
 		this.teamSpawns = new ArrayList<Location>(teamSpawn);
 		this.spawnVolumes = new HashMap<Location, Volume>();
@@ -77,6 +79,8 @@ public class Team {
 		}
 		return null;
 	}
+
+	private Hologram teamHologram;
 
 	public Warzone getZone() {
 		return this.warzone;
@@ -148,21 +152,16 @@ public class Team {
 			yaw = (int) (360 + (teamSpawn.getYaw() % 360));
 		}
 		Block signBlock = null;
-		BlockFace signDirection = null;
 
 		if (style.equals(TeamSpawnStyle.SMALL)) {
 			// SMALL style
 			if (yaw >= 0 && yaw < 90) {
-				signDirection = BlockFace.SOUTH_WEST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.NORTH()).getRelative(Direction.WEST());
 			} else if (yaw >= 90 && yaw <= 180) {
-				signDirection = BlockFace.NORTH_WEST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.NORTH()).getRelative(Direction.EAST());
 			} else if (yaw >= 180 && yaw < 270) {
-				signDirection = BlockFace.NORTH_EAST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH()).getRelative(Direction.EAST());
 			} else if (yaw >= 270 && yaw <= 360) {
-				signDirection = BlockFace.SOUTH_EAST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH()).getRelative(Direction.WEST());
 			}
 		} else if (style.equals(TeamSpawnStyle.MINIMAL)) {
@@ -194,7 +193,6 @@ public class Team {
 			this.setBlock(x - 2, y - 1, z - 2, this.kind);
 
 			if (yaw >= 0 && yaw < 90) {
-				signDirection = BlockFace.SOUTH_WEST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.NORTH(), 2).getRelative(Direction.WEST(), 2);
 
 				if (style.equals(TeamSpawnStyle.BIG)) {
@@ -225,7 +223,6 @@ public class Team {
 					this.setBlock(x + 2, y + 3, z - 2, this.kind);
 				}
 			} else if (yaw >= 90 && yaw <= 180) {
-				signDirection = BlockFace.NORTH_WEST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.NORTH(), 2).getRelative(Direction.EAST(), 2);
 				if (style.equals(TeamSpawnStyle.BIG)) {
 					// rim
@@ -255,7 +252,6 @@ public class Team {
 					this.setBlock(x + 2, y + 3, z + 2, this.kind);
 				}
 			} else if (yaw >= 180 && yaw < 270) {
-				signDirection = BlockFace.NORTH_EAST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH(), 2).getRelative(Direction.EAST(), 2);
 				if (style.equals(TeamSpawnStyle.BIG)) {
 					// rim
@@ -285,7 +281,6 @@ public class Team {
 					this.setBlock(x - 2, y + 3, z + 2, this.kind);
 				}
 			} else if (yaw >= 270 && yaw <= 360) {
-				signDirection = BlockFace.SOUTH_EAST.getOppositeFace();
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH(), 2).getRelative(Direction.WEST(), 2);
 				if (style.equals(TeamSpawnStyle.BIG)) {
 					// rim
@@ -320,39 +315,30 @@ public class Team {
 		if (signBlock != null) {
 			String[] lines;
 			if (this.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) == -1) {
-				lines = MessageFormat
-						.format(War.war.getString("sign.team.unlimited"),
-								this.name,
-								this.players.size(),
-								this.getTeamConfig().resolveInt(
-										TeamConfig.TEAMSIZE),
-								this.points,
-								this.getTeamConfig().resolveInt(
-										TeamConfig.MAXSCORE)).split("\n");
+				lines = MessageFormat.format(War.war.getString("sign.team.unlimited"), this.name, this.players.size(), this.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE), this.points, this.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)).split("\n");
 			} else {
-				lines = MessageFormat
-						.format(War.war.getString("sign.team.limited"),
-								this.name,
-								this.players.size(),
-								this.getTeamConfig().resolveInt(
-										TeamConfig.TEAMSIZE),
-								this.points,
-								this.getTeamConfig().resolveInt(
-										TeamConfig.MAXSCORE),
-								this.remainingLives,
-								this.getTeamConfig().resolveInt(
-										TeamConfig.LIFEPOOL)).split("\n");
+				lines = MessageFormat.format(War.war.getString("sign.team.limited"), this.name, this.players.size(), this.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE), this.points, this.getTeamConfig().resolveInt(TeamConfig.MAXSCORE), this.remainingLives, this.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL)).split("\n");
 			}
-			signBlock.setType(Material.OAK_SIGN);
-			org.bukkit.block.Sign block = (org.bukkit.block.Sign) signBlock
-					.getState();
-			org.bukkit.material.Sign data = (Sign) block.getData();
-			data.setFacingDirection(signDirection);
-			block.setData(data);
-			for (int i = 0; i < 4; i++) {
-				block.setLine(i, lines[i]);
+
+			// create a new hologram at the signBlock's location
+			if (teamHologram == null) {
+				// Only create a new hologram if it doesn't already exist
+				HolographicDisplaysAPI HologramsAPI = HolographicDisplaysAPI.get(War.war); // The API instance for your plugin
+
+				Location originalLocation = signBlock.getLocation();
+				Location hologramLocation = originalLocation.add(0, 2, 1);
+
+				teamHologram = HologramsAPI.createHologram(hologramLocation);
+			} else {
+				// If the hologram already exists, clear it so we can add the updated lines
+				teamHologram.getLines().clear();
 			}
-			block.update(true);
+
+
+			// add each line to the hologram
+			for (String line : lines) {
+				teamHologram.getLines().appendText(line);
+			}
 		}
 	}
 
@@ -495,8 +481,14 @@ public class Team {
 
 		return this.spawnVolumes;
 	}
-
+	public void resetHologram() {
+		if (teamHologram != null) {
+			teamHologram.delete();
+			teamHologram = null;  // Clear the reference so we know the hologram has been deleted
+		}
+	}
 	public void resetSign() {
+		resetHologram();
 		for (Entry<Location, Volume> spawnEntry : this.getSpawnVolumes().entrySet()) {
 			spawnEntry.getValue().resetBlocks();
 			this.initializeTeamSpawn(spawnEntry.getKey()); // reset everything instead of just sign

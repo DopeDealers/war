@@ -17,6 +17,10 @@
       <url>https://maven.cmastudios.me/</url>
     </repository>
     <repository>
+      <id>codemc-repo</id>
+      <url>https://repo.codemc.io/repository/maven-public/</url>
+    </repository>
+    <repository>
         <id>jitpack.io</id>
         <url>https://jitpack.io</url>
       </repository>
@@ -132,6 +136,12 @@
       <groupId>com.sk89q.worldedit</groupId>
       <artifactId>worldedit-bukkit</artifactId>
       <version>7.2.14</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>me.filoghost.holographicdisplays</groupId>
+      <artifactId>holographicdisplays-api</artifactId>
+      <version>3.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

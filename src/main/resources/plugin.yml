@@ -2,10 +2,10 @@ name: ${project.name}
 version: ${project.version}
 api-version: 1.13
 description: ${project.description}
-author: tommytony
+author: tommytony, iAngry
 website: ${project.url}
 main: com.tommytony.war.War
-softdepend: [WorldEdit, Vault, TAB]
+softdepend: [WorldEdit, Vault, TAB, HolographicDisplays]
 permissions:
   war.*:
     description: Full War permissions. Create and destroy warzones. Change War configuration.

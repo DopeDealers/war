@@ -66,6 +66,7 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 			zone.getTeams().remove(team);
 			if (zone.getLobby() != null) {
 				zone.getLobby().setLocation(zone.getTeleport());
+				team.resetHologram();
 				zone.getLobby().initialize();
 			}
 			WarzoneYmlMapper.save(zone);
