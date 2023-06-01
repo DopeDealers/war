@@ -1,6 +1,10 @@
 ![War logo](http://i.imgur.com/LFdiF.png "War - Minecraft PVP Arenas - TDM, CTF and more!")
 
-War 1.16+ - Minecraft PVP Arenas (TDM, CTF and more!)
+War 1.19+ - Minecraft PVP Arenas (TDM, CTF and more!)
+
+This fork updates the plugin to work on 1.19.4
+
+
 ===============================================
 
 War is a plugin for Bukkit that adds PVP arenas and team deathmatch gamemodes to Minecraft servers.
@@ -17,15 +21,15 @@ Features
 - Other game types: capture points and explosive-based objectives
 - Up to 16 teams!
 - Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))
-- 1.8 PvP - See [Warzone-Config](https://github.com/Jakllp/war/wiki/Warzone-Config) - Thanks [OldCombatMechanics](https://www.spigotmc.org/resources/oldcombatmechanics-disable-1-9-hit-cooldown.19510/) for being OpenSource!
+- 1.8 PvP - See [Warzone-Config](https://github.com/iangry0/war/wiki/Warzone-Config) - Thanks [OldCombatMechanics](https://www.spigotmc.org/resources/oldcombatmechanics-disable-1-9-hit-cooldown.19510/) for being OpenSource!
 
 Downloads
 ---------
-You can find the newest release at https://github.com/Jakllp/war/releases/tag/latest.
+You can find the newest release at https://github.com/iangry0/war/releases/tag/latest.
 
 Older/Pre Releases
 ----------
-All releases, including pre-releases are available at https://github.com/Jakllp/war/releases/.
+All releases, including pre-releases are available at https://github.com/iangry0/war/releases/.
 
 Original-Author
 ------
