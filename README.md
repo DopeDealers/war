@@ -2,12 +2,19 @@
 
 War 1.19+ - Minecraft PVP Arenas (TDM, CTF and more!)
 
-This fork updates the plugin to work on 1.19.4
+This fork updates the plugin to work on 1.19.4 and adds some new features
 
 
 ===============================================
 
 War is a plugin for Bukkit that adds PVP arenas and team deathmatch gamemodes to Minecraft servers.
+
+
+Dependencies
+----------------
+- HolographicDisplays (https://github.com/filoghost/HolographicDisplays)
+- WorldEdit v7.2.14 (https://dev.bukkit.org/projects/worldedit)
+- TAB (https://github.com/NEZNAMY/TAB) (soft dependency, not required for plugin to work)
 
 Official website
 ----------------
