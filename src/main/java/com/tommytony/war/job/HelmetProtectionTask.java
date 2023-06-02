@@ -29,7 +29,7 @@ public class HelmetProtectionTask implements Runnable {
 				for (Player player : team.getPlayers()) {
 					PlayerInventory playerInv = player.getInventory();
 					Material teamBlockMaterial;
-					
+
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 						teamBlockMaterial = team.getKind().getMaterial();
 						// 1) Replace missing block head
