@@ -16,6 +16,10 @@ Dependencies
 - WorldEdit v7.2.14 (https://dev.bukkit.org/projects/worldedit)
 - TAB (https://github.com/NEZNAMY/TAB) (soft dependency, not required for plugin to work)
 
+If you'd like a map voting system, I created a plugin which works well with this one
+https://github.com/iangry0/LobbySystem
+https://www.spigotmc.org/resources/lobby-system.110230/
+
 Official website
 ----------------
 Visit http://war.tommytony.com for more info, videos and links.
