@@ -236,11 +236,13 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.MAXZONES, 12);
 		warConfig.put(WarConfig.PVPINZONESONLY, false);
 		warConfig.put(WarConfig.TNTINZONESONLY, false);
+		warConfig.put(WarConfig.RESTARTONGAMEEND, false);
 		warConfig.put(WarConfig.RESETSPEED, 5000);
 		warConfig.put(WarConfig.MAXSIZE, 750);
 		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().toString());
 		warConfig.put(WarConfig.AUTOJOIN, "");
 		warConfig.put(WarConfig.TPWARMUP, 0);
+
 
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.tommytony.war.config.*;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
 import org.apache.commons.lang.StringUtils;
@@ -57,13 +58,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import com.google.common.collect.ImmutableList;
-import com.tommytony.war.config.InventoryBag;
-import com.tommytony.war.config.ScoreboardType;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.TeamConfigBag;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.event.WarBattleWinEvent;
 import com.tommytony.war.event.WarPlayerLeaveEvent;
 import com.tommytony.war.event.WarPlayerThiefEvent;
@@ -1637,11 +1631,11 @@ public class Warzone {
 			t.teamcast(winnersStrAndExtra);
 			double ecoReward = t.getTeamConfig().resolveDouble(TeamConfig.ECOREWARD);
 			boolean doEcoReward = ecoReward != 0 && War.war.getEconomy() != null;
-			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
+			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext(); ) {
 				Player tp = it.next();
-				
+
 				this.showNametags(tp, t);
-				
+
 				it.remove(); // Remove player from team first to prevent anti-tp
 				t.removePlayer(tp);
 				tp.teleport(this.getEndTeleport(LeaveCause.SCORECAP));
@@ -1657,8 +1651,8 @@ public class Warzone {
 						}
 						if (!r.transactionSuccess()) {
 							War.war.getLogger().log(Level.WARNING,
-								"Failed to reward player {0} ${1}. Error: {2}",
-								new Object[] {tp.getName(), ecoReward, r.errorMessage});
+									"Failed to reward player {0} ${1}. Error: {2}",
+									new Object[]{tp.getName(), ecoReward, r.errorMessage});
 						}
 					}
 				}
@@ -1669,10 +1663,13 @@ public class Warzone {
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS) && !this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
 			this.reinitialize();
-		} else if(this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
+		} else if (this.getWarzoneConfig().getBoolean(WarzoneConfig.ONLYRESETCHESTS)) {
 			this.resetChests();
 		} else {
 			this.initializeZone();
+		}
+		if (War.war.getWarConfig().getBoolean(WarConfig.RESTARTONGAMEEND)) {
+			Bukkit.getServer().spigot().restart();
 		}
 	}
 

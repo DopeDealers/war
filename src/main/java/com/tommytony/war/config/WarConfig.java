@@ -9,6 +9,7 @@ public enum WarConfig {
 	MAXZONES (Integer.class, "Max zones", "Limit on number of zones that can be created"),
 	PVPINZONESONLY (Boolean.class, "PVP in zones only", "If true, limits PVP to warzones"),
 	TNTINZONESONLY (Boolean.class, "TNT in zones only", "If true, limits TNT to warzones"),
+	RESTARTONGAMEEND (Boolean.class, "Restart on game end", "If true, restarts the server when a game fully ends"),
 	RESETSPEED (Integer.class, "Reset speed", "Number of blocks to reset per tick"),
 	MAXSIZE (Integer.class, "Max size", "Maximum volume of a warzone"),
 	LANGUAGE (String.class, "Language", "Preferred server language"),
