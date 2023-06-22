@@ -18,7 +18,6 @@ Dependencies
 
 If you'd like a map voting system, I created a plugin which works well with this one
 https://github.com/iangry0/LobbySystem
-https://www.spigotmc.org/resources/lobby-system.110230/
 
 Official website
 ----------------
