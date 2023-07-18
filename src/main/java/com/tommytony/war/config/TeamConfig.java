@@ -16,6 +16,8 @@ public enum TeamConfig {
 	TEAMDIFFERENCE (Integer.class, "Team Difference", "Maximum player difference between teams"),
 	PERMISSION (String.class, "Required Permission", "Only allow players with a certain permission to join a team"),
 	XPKILLMETER (Boolean.class, "XP Kill Meter", "Use the XP bar to count kills"),
+	KILLECO(Boolean.class, "Kill rewards eco", "Enable or disable killrewards economy"),
+	KILLSECOREWARD(Double.class, "Kill rewards for the player", "Rewards the player based on the amount set"),
 	KILLSTREAK (Boolean.class, "Killstreak Rewards", "Reward players for kills based on war.yml configuration"),
 	BLOCKWHITELIST (String.class, "Block Whitelist", "Comma-separated list of blocks players may break or place, 'all' removes this limit"),
 	PLACEBLOCK (Boolean.class, "Place Blocks", "If true, players can place blocks"),

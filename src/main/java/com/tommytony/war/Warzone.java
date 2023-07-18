@@ -1188,6 +1188,11 @@ public class Warzone {
 		this.addKillCount(attacker.getName(), 1);
 		this.addKillDeathRecord(attacker, 1, 0);
 		this.addKillDeathRecord(defender, 0, 1);
+
+		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.KILLECO)) {
+			double eco = attackerTeam.getTeamConfig().resolveDouble(TeamConfig.KILLSECOREWARD);
+			War.war.getEconomy().depositPlayer(attackerTeam.getName(), eco);
+		}
 		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 			attacker.setLevel(this.getKillCount(attacker.getName()));
 		}

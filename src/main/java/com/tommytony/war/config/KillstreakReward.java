@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.tommytony.war.event.WarBattleWinEvent;
+import com.tommytony.war.event.WarScoreEvent;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
@@ -111,6 +113,7 @@ public class KillstreakReward {
 					}
 				}
 			}
+
 			if (killSection.contains("reward.xp") && !playerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				// Will not work if XPKILLMETER is enabled
 				player.setLevel(player.getLevel() + killSection.getInt("reward.xp"));
@@ -119,6 +122,7 @@ public class KillstreakReward {
 				for (int i = 0; i < killSection.getInt("reward.points"); i++) {
 					playerTeam.addPoint();
 				}
+
 				// Detect win conditions
 				if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
 					player.getServer().getScheduler().runTaskLater(War.war, new Runnable() {
@@ -128,6 +132,9 @@ public class KillstreakReward {
 					}, 1L);
 				} else {
 					// just added a point
+					// and handle new event
+					WarScoreEvent event1 = new WarScoreEvent(Team.getTeamByPlayerName(player.getName()), player, playerTeam.getPoints());
+					War.war.getServer().getPluginManager().callEvent(event1);
 					playerTeam.resetSign();
 					zone.getLobby().resetTeamGateSign(playerTeam);
 				}
