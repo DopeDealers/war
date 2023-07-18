@@ -305,6 +305,7 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.KILLSECOREWARD, 100);
 		teamDefaultConfig.put(TeamConfig.INVENTORYDROP, false);
 		teamDefaultConfig.put(TeamConfig.BORDERDROP, false);
+		teamDefaultConfig.put(TeamConfig.ENABLEWOOLGLITCH, true);
 
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();

@@ -24,7 +24,8 @@ public enum TeamConfig {
 	APPLYPOTION (String.class, "Apply Potion Effect", "Give players a potion effect after each death, Format: EFFECT;DURATION;STRENGTH"),
 	ECOREWARD (Double.class, "Economy Reward", "Give the winning team this much money, requires Vault plugin"),
 	INVENTORYDROP (Boolean.class, "Drop Inventory", "If true, players will drop items on death"),
-	BORDERDROP(Boolean.class, "Drop Near Border", "If true, players can drop items near the border\nUsually enabled to prevent duping");
+	BORDERDROP(Boolean.class, "Drop Near Border", "If true, players can drop items near the border\nUsually enabled to prevent duping"),
+	ENABLEWOOLGLITCH(Boolean.class, "Wool glitch", "Enable or disable the wool glitch from earlier versions");
 	
 	private final Class<?> configType;
 	private final String title;

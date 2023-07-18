@@ -1,9 +1,6 @@
 package com.tommytony.war.event;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.Validate;
@@ -1250,12 +1247,13 @@ public class WarPlayerListener implements Listener {
 		}
 		Player player = (Player) event.getWhoClicked();
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		Team team = Team.getTeamByPlayerName(player.getName());
 		if (zone == null) {
 			return;
 		}
 		if (zone.isThief(player)) {
 			// Prevent thieves from taking their bomb/wool/cake into a chest, etc.
-			event.setCancelled(true);
+			if (!Objects.requireNonNull(team).getTeamConfig().resolveBoolean(TeamConfig.ENABLEWOOLGLITCH)) event.setCancelled(true);
 			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 10, 10);
 		} else if (event.getSlotType() == InventoryType.SlotType.ARMOR && event.getSlot() == 39
 				&& zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
@@ -1263,9 +1261,8 @@ public class WarPlayerListener implements Listener {
 			ItemStack teamBlock = zone.getPlayerTeam(player.getName()).getKind().getBlockHead();
 			player.getInventory().remove(teamBlock.getType());
 			// Deprecated behavior cannot be removed as it is essential to this function
-			//noinspection deprecation
 			event.setCursor(teamBlock);
-			event.setCancelled(true);
+			if (!Objects.requireNonNull(team).getTeamConfig().resolveBoolean(TeamConfig.ENABLEWOOLGLITCH)) event.setCancelled(true);
 		}
 	}
 
