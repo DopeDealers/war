@@ -115,7 +115,7 @@ public class War extends JavaPlugin {
 	private boolean loaded = false;
 	// Zones and hub
 	private List<Warzone> warzones = new ArrayList<Warzone>();
-	private WarHub warHub;
+	//private WarHub warHub;
 	private HashMap<String, PlayerState> disconnected = new HashMap<String, PlayerState>();
 	private KillstreakReward killstreakReward;
 	private List<Weapon> weapons = new ArrayList<Weapon>();
@@ -417,9 +417,9 @@ public class War extends JavaPlugin {
 		}
 		this.warzones.clear();
 
-		if (this.warHub != null) {
-			this.warHub.getVolume().resetBlocks();
-		}
+//		if (this.warHub != null) {
+//			this.warHub.getVolume().resetBlocks();
+//		}
 
 		this.getServer().getScheduler().cancelTasks(this);
 		this.playerListener.purgeLatestPositions();
@@ -834,10 +834,10 @@ public class War extends JavaPlugin {
 							updatedWarhubMaterials = true;
 						}
 
-						if (updatedWarhubMaterials && War.war.getWarHub() != null) {
-							War.war.getWarHub().getVolume().resetBlocks();
-							War.war.getWarHub().initialize();
-						}
+//						if (updatedWarhubMaterials && War.war.getWarHub() != null) {
+//							War.war.getWarHub().getVolume().resetBlocks();
+//							War.war.getWarHub().initialize();
+//						}
 					}
 				}
 			}
@@ -1288,13 +1288,13 @@ public class War extends JavaPlugin {
 		return this.incompleteZones;
 	}
 
-	public WarHub getWarHub() {
-		return this.warHub;
-	}
-
-	public void setWarHub(WarHub warHub) {
-		this.warHub = warHub;
-	}
+//	public WarHub getWarHub() {
+//		return this.warHub;
+//	}
+//
+//	public void setWarHub(WarHub warHub) {
+//		this.warHub = warHub;
+//	}
 
 	public boolean isLoaded() {
 		return this.loaded;
